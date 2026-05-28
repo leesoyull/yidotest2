@@ -21,7 +21,6 @@
         },
         "serviceType": {
           "type": "string",
-          "enum": ["하자보수", "방수공사", "도장공사", "시설관리", "기타"],
           "description": "The type of service requested"
         },
         "content": {

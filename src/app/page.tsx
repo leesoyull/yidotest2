@@ -34,7 +34,7 @@ export default function Home() {
       <SectionReveal id="about" className="bg-white py-10 md:py-14">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
-            {/* Left Column: Text Content - md:pl-20 added to shift right slightly */}
+            {/* Left Column: Text Content */}
             <div className="space-y-6 md:pl-20">
               <div>
                 <RevealItem>
@@ -143,23 +143,23 @@ export default function Home() {
       </SectionReveal>
 
       {/* CTA Band */}
-      <SectionReveal id="contact" className="bg-primary text-white py-6">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="space-y-1 text-center md:text-left">
+      <SectionReveal id="contact" className="bg-primary text-white py-20">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="space-y-2 text-center md:text-left">
             <RevealItem>
-              <h3 className="font-headline text-2xl md:text-3xl font-bold leading-tight">견적을 의뢰하고 싶으신가요?</h3>
-              <p className="text-white/70 text-sm font-light">건물의 안전과 가치를 지키는 이도건설이 함께합니다.</p>
+              <h3 className="font-headline text-3xl md:text-4xl font-bold leading-tight">견적을 의뢰하고 싶으신가요?</h3>
+              <p className="text-white/70 text-base md:text-lg font-light">건물의 안전과 가치를 지키는 이도건설이 함께합니다.</p>
             </RevealItem>
           </div>
-          <div className="flex flex-col items-center md:items-end gap-3">
+          <div className="flex flex-col items-center md:items-end gap-4">
             <RevealItem delay={100}>
-              <div className="flex items-center gap-3 py-1.5 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
-                <Mail className="text-accent w-4 h-4" />
-                <span className="font-bold text-accent text-sm">yido610@naver.com</span>
+              <div className="flex items-center gap-3 py-2 px-8 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                <Mail className="text-accent w-5 h-5" />
+                <span className="font-bold text-accent text-base">yido610@naver.com</span>
               </div>
             </RevealItem>
             <RevealItem delay={200}>
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-11 px-8 rounded-full text-base font-black transition-all shadow-lg">
+              <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-14 px-10 rounded-full text-lg font-black transition-all shadow-xl">
                 <Link href="/inquiry">지금 바로 문의하기</Link>
               </Button>
             </RevealItem>

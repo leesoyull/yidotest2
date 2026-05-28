@@ -11,7 +11,7 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/5">
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-white">
-              <div className="bg-accent p-1.5 rounded-lg">
+              <div className="bg-primary p-1.5 rounded-lg">
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <span className="font-headline font-bold text-2xl tracking-tight">이도건설</span>
@@ -58,7 +58,7 @@ export function Footer() {
             </ul>
             <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
                <p className="text-[11px] leading-relaxed text-white/40">
-                 견적 및 시공 문의는 이메일로 연락 주시면 24시간 이내에 전문 상담사가 회신 드립니다.
+                 건물의 안전과 가치를 지키는 이도건설입니다.
                </p>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function Navbar() {
+  const inquiryLink = "http://www.kumyoungenc.com/pc/customer/customer04.php";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -70,7 +71,7 @@ export function Navbar() {
             </div>
           ))}
           <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold rounded-full px-6 border-none">
-            <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php">무료 견적 받기</Link>
+            <Link href={inquiryLink}>무료 견적 받기</Link>
           </Button>
         </div>
 
@@ -94,7 +95,7 @@ export function Navbar() {
             </Link>
           ))}
           <Button className="w-full rounded-full" asChild onClick={() => setIsOpen(false)}>
-            <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php">무료 견적 받기</Link>
+            <Link href={inquiryLink}>무료 견적 받기</Link>
           </Button>
         </div>
       )}

@@ -9,6 +9,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 
 export function Hero() {
+  const inquiryLink = "http://www.kumyoungenc.com/pc/customer/customer04.php";
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [
     {
@@ -74,7 +75,7 @@ export function Hero() {
                   <Link href="#business">사업분야 보기</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 px-8 h-14 rounded-full text-md font-medium">
-                  <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php">견적 문의</Link>
+                  <Link href={inquiryLink}>견적 문의</Link>
                 </Button>
               </div>
             </div>

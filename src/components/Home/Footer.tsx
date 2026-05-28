@@ -16,8 +16,8 @@ export function Footer() {
               </div>
               <span className="font-headline font-bold text-2xl tracking-tight">이도건설</span>
             </div>
-            <div className="text-sm font-medium text-white/60">
-              대표이사: 이소율
+            <div className="text-sm font-medium text-white/60 uppercase tracking-wider">
+              CEO : LEE SOYUL
             </div>
           </div>
 

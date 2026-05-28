@@ -11,31 +11,32 @@ interface LogoProps {
 
 export function Logo({ className, variant = 'dark' }: LogoProps) {
   const isWhite = variant === 'light';
-  const logoBlue = "#0059ab"; // 이미지의 신뢰감 있는 블루 컬러
+  const logoBlue = "#0059ab"; 
+  const logoDark = "#002d5a";
   
   return (
     <div className={cn("flex items-center gap-2 md:gap-3 group", className)}>
-      <div className="relative w-8 h-10 md:w-11 md:h-13 flex-shrink-0 transition-transform group-hover:scale-105">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          {/* 외부 집 모양과 내부 집 모양 구멍 (이미지 비율 정밀 반영) */}
+      <div className="relative w-8 h-10 md:w-9 md:h-12 flex-shrink-0 transition-transform group-hover:scale-105">
+        <svg viewBox="0 0 100 125" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          {/* Main House Shape - Slimmer proportions for a modern look */}
           <path 
             fillRule="evenodd" 
             clipRule="evenodd" 
-            d="M0 45L50 10L100 45V100H0V45ZM32 68L50 55L68 68V100H32V68Z" 
+            d="M10 50L50 15L90 50V115H10V50ZM32 78L50 66L68 78V115H32V78Z" 
             fill={isWhite ? "white" : logoBlue} 
           />
-          {/* 이미지 하단에 있는 특유의 대각선 절개선 */}
+          {/* Refined bottom detail: The signature diagonal cut line at the bottom left corner */}
           <path 
-            d="M0 100L32 68" 
+            d="M10 115L32 78" 
             stroke={isWhite ? "white" : logoBlue} 
-            strokeWidth="4" 
+            strokeWidth="6" 
             strokeLinecap="round"
           />
         </svg>
       </div>
       <span className={cn(
         "font-sans font-black text-2xl md:text-3xl tracking-tighter",
-        isWhite ? "text-white" : "text-[#002d5a]"
+        isWhite ? "text-white" : logoDark
       )}>
         이도건설
       </span>

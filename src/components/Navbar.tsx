@@ -69,7 +69,7 @@ export function Navbar() {
               </div>
             </div>
           ))}
-          <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold rounded-full px-6">
+          <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold rounded-full px-6 border-none">
             <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php">무료 견적 받기</Link>
           </Button>
         </div>

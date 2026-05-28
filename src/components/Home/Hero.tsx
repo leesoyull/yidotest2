@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/button';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
@@ -70,11 +70,11 @@ export function Hero() {
                 {slide.desc}
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 h-14 rounded-full text-md font-bold transition-all transform hover:scale-105">
-                  사업분야 보기
+                <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 h-14 rounded-full text-md font-bold transition-all transform hover:scale-105 border-none">
+                  <Link href="#business">사업분야 보기</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 px-8 h-14 rounded-full text-md font-medium">
-                  견적 문의
+                <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 px-8 h-14 rounded-full text-md font-medium">
+                  <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php">견적 문의</Link>
                 </Button>
               </div>
             </div>

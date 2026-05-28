@@ -11,36 +11,24 @@ interface LogoProps {
 
 export function Logo({ className, variant = 'dark' }: LogoProps) {
   const isWhite = variant === 'light';
+  const logoBlue = "#0062df"; // 이미지의 선명한 블루 컬러 반영
   
   return (
-    <div className={cn("flex items-center gap-2 md:gap-3 group", className)}>
-      <div className="relative w-8 h-8 md:w-10 md:h-10 flex-shrink-0 transition-transform group-hover:scale-105">
+    <div className={cn("flex items-center gap-3 md:gap-4 group", className)}>
+      <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          {/* 지붕 부분 - 더 날렵하고 세련된 각도 */}
+          {/* 외부 집 모양 (Pentagon) */}
           <path 
-            d="M50 15L10 48V58L50 25L90 58V48L50 15Z" 
-            fill={isWhite ? "white" : "hsl(var(--primary))"} 
-          />
-          {/* 본체 부분 - 안정감 있는 구조 */}
-          <path 
-            d="M20 55V85H80V55H70V75H30V55H20Z" 
-            fill={isWhite ? "white" : "hsl(var(--primary))"} 
-          />
-          {/* 중앙 포인트 - 건축적 디테일 */}
-          <rect 
-            x="44" y="60" width="12" height="25" 
-            fill={isWhite ? "white" : "hsl(var(--primary))"} 
-          />
-          {/* 하단 기단 - 견고함 상징 */}
-          <rect 
-            x="15" y="88" width="70" height="4" 
-            fill={isWhite ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.1)"} 
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M0 45L50 5L100 45V95H0V45ZM38 65L50 55L62 65V88H38V65ZM0 95L38 88V90L3 95H0Z" 
+            fill={isWhite ? "white" : logoBlue} 
           />
         </svg>
       </div>
       <span className={cn(
-        "font-headline font-bold text-xl md:text-2xl tracking-tighter transition-colors",
-        isWhite ? "text-white" : "text-primary"
+        "font-sans font-black text-2xl md:text-3xl tracking-tighter",
+        isWhite ? "text-white" : "text-[#002d5a]" // 텍스트는 이미지처럼 아주 짙은 블루/블랙 계열
       )}>
         이도건설
       </span>

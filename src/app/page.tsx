@@ -4,6 +4,7 @@ import { Hero } from '@/components/Home/Hero';
 import { SectionReveal, RevealItem } from '@/components/SectionReveal';
 import { BusinessGrid } from '@/components/Home/BusinessGrid';
 import { StatsBand } from '@/components/Home/StatsBand';
+import { ProjectStatus } from '@/components/Home/ProjectStatus';
 import { Footer } from '@/components/Home/Footer';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Mail, ArrowRight } from 'lucide-react';
@@ -99,8 +100,28 @@ export default function Home() {
         </div>
       </SectionReveal>
 
+      {/* Project Status Section */}
+      <SectionReveal id="status" className="bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <RevealItem>
+              <span className="text-accent font-bold text-xs tracking-widest uppercase">Performance</span>
+            </RevealItem>
+            <RevealItem delay={100}>
+              <h2 className="font-headline text-4xl md:text-5xl font-bold">이도건설 시공 실적 현황</h2>
+            </RevealItem>
+            <RevealItem delay={200}>
+              <p className="text-muted-foreground text-lg font-light">
+                매년 성장하며 신뢰를 쌓아가고 있습니다.
+              </p>
+            </RevealItem>
+          </div>
+          <ProjectStatus />
+        </div>
+      </SectionReveal>
+
       {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-white">
+      <SectionReveal id="why" className="bg-background">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
             <RevealItem>

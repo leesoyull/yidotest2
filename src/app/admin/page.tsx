@@ -40,18 +40,18 @@ export default function AdminPage() {
     }
   }, []);
 
-  // 쿼리 안정화를 위한 useMemo 사용
-  const inquiryQuery = useMemo(() => 
-    query(collection(db, 'inquiries'), orderBy('createdAt', 'desc')),
-    [db]
-  );
+  // 쿼리를 useMemo로 안정화하여 실시간 데이터 연동 속도 향상
+  const inquiryQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
+  }, [db]);
   
   const { data: inquiries, loading: inquiriesLoading } = useCollection(inquiryQuery);
 
-  const portfolioQuery = useMemo(() => 
-    query(collection(db, 'portfolios'), orderBy('createdAt', 'desc')),
-    [db]
-  );
+  const portfolioQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
+  }, [db]);
   
   const { data: portfolios } = useCollection(portfolioQuery);
 

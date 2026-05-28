@@ -31,14 +31,14 @@ export default function Home() {
       </div>
 
       {/* About Section */}
-      <SectionReveal id="about" className="bg-white py-40">
+      <SectionReveal id="about" className="bg-white py-48">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="space-y-12">
               <RevealItem>
-                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-8 block">Company Intro</span>
-                <h2 className="font-brush text-8xl text-primary leading-tight">
-                  이도 <span className="text-4xl font-normal ml-2 opacity-80">(利道)</span>
+                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-12 block">Company Intro</span>
+                <h2 className="font-brush text-9xl text-primary leading-none flex items-baseline">
+                  이도 <span className="font-body text-3xl font-normal ml-6 opacity-60 tracking-normal">(利道)</span>
                 </h2>
               </RevealItem>
               <RevealItem delay={100}>
@@ -56,7 +56,7 @@ export default function Home() {
                   </div>
                 </div>
               </RevealItem>
-              <RevealItem delay={200} className="pt-16">
+              <RevealItem delay={200} className="pt-24">
                 <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
                   <Link href="/inquiry" className="flex items-center gap-2">
                     상담 문의하기 <ArrowRight className="w-4 h-4" />
@@ -124,7 +124,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-background py-40">
+      <SectionReveal id="why" className="bg-background py-48">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-24 space-y-6">
             <RevealItem>

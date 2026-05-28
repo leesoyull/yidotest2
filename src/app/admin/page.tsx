@@ -54,7 +54,7 @@ export default function AdminPage() {
 
     setLoading(true);
     try {
-      await addDoc(collection(db, 'portfolios'), {
+      addDoc(collection(db, 'portfolios'), {
         ...newPortfolio,
         createdAt: serverTimestamp()
       });
@@ -70,7 +70,7 @@ export default function AdminPage() {
   const handleDeletePortfolio = async (id: string) => {
     if (!confirm('정말로 삭제하시겠습니까?')) return;
     try {
-      await deleteDoc(doc(db, 'portfolios', id));
+      deleteDoc(doc(db, 'portfolios', id));
       toast({ title: "삭제 완료", description: "포트폴리오가 삭제되었습니다." });
     } catch (error) {
       toast({ variant: "destructive", title: "오류", description: "삭제에 실패했습니다." });
@@ -117,7 +117,6 @@ export default function AdminPage() {
           </TabsList>
 
           <TabsContent value="portfolio" className="space-y-8">
-            {/* Add Portfolio Form */}
             <Card>
               <CardHeader>
                 <CardTitle>새 시공사례 등록</CardTitle>
@@ -189,7 +188,6 @@ export default function AdminPage() {
               </CardContent>
             </Card>
 
-            {/* Portfolio List */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {portfolios?.map((item) => (
                 <Card key={item.id} className="overflow-hidden group">

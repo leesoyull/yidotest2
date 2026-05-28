@@ -45,7 +45,7 @@ export function ProjectStatus() {
             </div>
             {stat.highlight && (
               <div className="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-medium flex justify-between items-center">
-                <span>* 실적 합산 기준</span>
+                <span>* 기존 실적 및 신규 등록 건 합산 기준</span>
                 <span className="text-accent font-bold flex items-center gap-1">전체보기 →</span>
               </div>
             )}

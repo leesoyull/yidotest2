@@ -12,11 +12,14 @@ export function ProjectStatus() {
   const { data: portfolios } = useCollection(collection(db, 'portfolios'));
 
   const portfolioCount = useMemo(() => portfolios?.length || 0, [portfolios]);
+  
+  // 2025년(12건) + 2026년(8건) + 관리자 등록 건수
+  const totalCumulativeCount = useMemo(() => 12 + 8 + portfolioCount, [portfolioCount]);
 
   const stats = [
     { label: '2025년 완수 실적', value: '12건', icon: <Calendar className="w-6 h-6" /> },
     { label: '2026년 완수 실적', value: '8건', icon: <Calendar className="w-6 h-6" /> },
-    { label: '누적 시공 사례', value: `${portfolioCount}건`, icon: <CheckCircle className="w-6 h-6" />, highlight: true },
+    { label: '누적 시공 사례', value: `${totalCumulativeCount}건`, icon: <CheckCircle className="w-6 h-6" />, highlight: true },
   ];
 
   return (
@@ -42,7 +45,7 @@ export function ProjectStatus() {
             </div>
             {stat.highlight && (
               <div className="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-medium">
-                * 관리자 페이지 등록 건수 기준
+                * 기존 실적 및 신규 등록 건 합산 기준
               </div>
             )}
           </div>

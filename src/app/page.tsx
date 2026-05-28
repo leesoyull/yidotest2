@@ -42,9 +42,6 @@ export default function Home() {
               </RevealItem>
               <RevealItem delay={100}>
                 <div className="space-y-6 text-muted-foreground text-lg font-light leading-relaxed">
-                  <p className="font-bold text-primary">
-                    이롭고 바른 길을 함께 걷겠습니다
-                  </p>
                   <p>
                     이도건설의 사명 '이도(以道)'는 '이로울 이(以)'와 '길 도(道)'로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 뜻을 담고 있습니다. 작은 공사 하나도 정직하고 성실하게 완수하는 것을 최우선 가치로 삼습니다.
                   </p>

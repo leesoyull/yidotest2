@@ -7,10 +7,10 @@ import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
-    <footer className="bg-[#0d1f35] text-white/80 py-8">
+    <footer className="bg-[#0d1f35] text-white/80 py-6">
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Link href="/">
               <Logo variant="light" className="scale-90 origin-left" />
             </Link>
@@ -33,7 +33,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-2">
+        <div className="mt-6 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-2">
           <div className="text-[9px] text-white/30 uppercase tracking-widest">
             &copy; {new Date().getFullYear()} YIDO CONSTRUCTION. ALL RIGHTS RESERVED.
           </div>

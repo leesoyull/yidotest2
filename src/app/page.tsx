@@ -31,7 +31,7 @@ export default function Home() {
       </div>
 
       {/* About Section - COMPANY INTRO */}
-      <SectionReveal id="about" className="bg-white py-10 md:py-14">
+      <SectionReveal id="about" className="bg-white py-12 md:py-16">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left Column: Text Content */}
@@ -52,7 +52,7 @@ export default function Home() {
                 </RevealItem>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <RevealItem delay={200}>
                   <h3 className="font-bold text-primary text-3xl md:text-4xl tracking-tight leading-tight">
                     이롭고 바른 길을 <br/> 함께 걷겠습니다
@@ -143,7 +143,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* CTA Band */}
-      <SectionReveal id="contact" className="bg-primary text-white py-20">
+      <SectionReveal id="contact" className="bg-primary text-white py-32">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="space-y-2 text-center md:text-left">
             <RevealItem>

@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -19,7 +21,6 @@ export default function AdminPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminId, setAdminId] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -32,7 +33,6 @@ export default function AdminPage() {
     imageUrl: ''
   });
 
-  // 세션 확인
   useEffect(() => {
     const savedLogin = sessionStorage.getItem('yido_admin_login');
     if (savedLogin === 'true') {
@@ -40,11 +40,9 @@ export default function AdminPage() {
     }
   }, []);
 
-  // 상담문의 내역 실시간 바인딩 (최신순)
   const inquiryQuery = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
   const { data: inquiries, loading: inquiriesLoading } = useCollection(inquiryQuery);
 
-  // 시공사례 실시간 바인딩
   const portfolioQuery = query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
   const { data: portfolios } = useCollection(portfolioQuery);
 
@@ -69,45 +67,54 @@ export default function AdminPage() {
     toast({ title: "로그아웃 완료" });
   };
 
-  const handleDeleteInquiry = async (id: string) => {
+  const handleDeleteInquiry = (id: string) => {
     if (!confirm('해당 문의 내역을 삭제하시겠습니까?')) return;
-    try {
-      await deleteDoc(doc(db, 'inquiries', id));
-      toast({ title: "삭제되었습니다." });
-    } catch (error) {
-      toast({ variant: "destructive", title: "삭제 실패" });
-    }
+    const docRef = doc(db, 'inquiries', id);
+    deleteDoc(docRef)
+      .catch(async () => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete'
+        }));
+      });
+    toast({ title: "삭제 요청됨" });
   };
 
-  const handleAddPortfolio = async (e: React.FormEvent) => {
+  const handleAddPortfolio = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPortfolio.title || !newPortfolio.category || !newPortfolio.imageUrl) {
       toast({ variant: "destructive", title: "입력 부족", description: "필수 항목을 입력해 주세요." });
       return;
     }
     setIsSubmitting(true);
-    try {
-      await addDoc(collection(db, 'portfolios'), {
-        ...newPortfolio,
-        createdAt: serverTimestamp()
+    const colRef = collection(db, 'portfolios');
+    const data = { ...newPortfolio, createdAt: serverTimestamp() };
+    
+    addDoc(colRef, data)
+      .catch(async () => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: colRef.path,
+          operation: 'create',
+          requestResourceData: data
+        }));
       });
-      toast({ title: "시공사례 등록 완료" });
-      setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
-    } catch (error) {
-      toast({ variant: "destructive", title: "등록 실패" });
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    toast({ title: "시공사례 등록 완료" });
+    setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
+    setIsSubmitting(false);
   };
 
-  const handleDeletePortfolio = async (id: string) => {
+  const handleDeletePortfolio = (id: string) => {
     if (!confirm('삭제하시겠습니까?')) return;
-    try {
-      await deleteDoc(doc(db, 'portfolios', id));
-      toast({ title: "삭제 완료" });
-    } catch (error) {
-      toast({ variant: "destructive", title: "삭제 실패" });
-    }
+    const docRef = doc(db, 'portfolios', id);
+    deleteDoc(docRef)
+      .catch(async () => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete'
+        }));
+      });
+    toast({ title: "삭제 완료" });
   };
 
   if (!isLoggedIn) {
@@ -227,7 +234,6 @@ export default function AdminPage() {
                           </Button>
                         </div>
                       </div>
-                      
                       <div className="bg-muted/30 p-8 rounded-2xl border border-muted/50 relative">
                         <p className="text-lg leading-relaxed whitespace-pre-line text-primary/80 font-semibold italic">
                           "{iq.content}"
@@ -249,7 +255,6 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="portfolio" className="space-y-10">
-            {/* 시공사례 등록 폼 */}
             <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
               <CardHeader className="bg-primary text-white p-10">
                 <CardTitle className="text-2xl font-black">시공 사례 등록</CardTitle>
@@ -303,8 +308,6 @@ export default function AdminPage() {
                 </form>
               </CardContent>
             </Card>
-
-            {/* 기존 시공사례 목록 */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {portfolios?.map((item) => (
                 <Card key={item.id} className="overflow-hidden border-none shadow-xl rounded-3xl bg-white group">

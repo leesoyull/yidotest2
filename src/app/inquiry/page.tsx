@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Send, Mail, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function InquiryPage() {
   const { toast } = useToast();
@@ -28,7 +30,7 @@ export default function InquiryPage() {
     content: ''
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // 필수 항목 유효성 검사
@@ -43,34 +45,33 @@ export default function InquiryPage() {
 
     setLoading(true);
     
-    try {
-      // 1. Firestore 'inquiries' 컬렉션에 데이터 저장
-      const inquiriesRef = collection(db, 'inquiries');
-      await addDoc(inquiriesRef, {
-        ...formData,
-        createdAt: serverTimestamp() // 접수 시간 자동 기록
+    const inquiriesRef = collection(db, 'inquiries');
+    const dataToSave = {
+      ...formData,
+      createdAt: serverTimestamp()
+    };
+
+    // Firestore 저장 (await 하지 않음 - 즉각적인 UI 반응을 위해)
+    addDoc(inquiriesRef, dataToSave)
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: inquiriesRef.path,
+          operation: 'create',
+          requestResourceData: dataToSave,
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
 
-      // 2. 전송 완료 상태 고지 (UI 전환)
-      setSubmitted(true);
-      
-      toast({
-        title: "상담 신청 완료",
-        description: "담당자가 확인 후 신속하게 연락드리겠습니다.",
-      });
-    } catch (err: any) {
-      console.error("Firestore Save Error:", err);
-      toast({
-        variant: "destructive",
-        title: "접수 실패",
-        description: "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
-      });
-    } finally {
-      setLoading(false);
-    }
+    // 즉시 완료 상태로 전환 (낙관적 업데이트)
+    setSubmitted(true);
+    setLoading(false);
+    
+    toast({
+      title: "상담 신청 완료",
+      description: "담당자가 확인 후 신속하게 연락드리겠습니다.",
+    });
   };
 
-  // 전송 완료 후 보여줄 화면
   if (submitted) {
     return (
       <main className="min-h-screen bg-muted/30">
@@ -102,7 +103,6 @@ export default function InquiryPage() {
       <Navbar />
       <div className="pt-40 pb-20 container mx-auto px-6">
         <div className="max-w-5xl mx-auto grid lg:grid-cols-3 gap-12">
-          {/* 안내 정보 영역 */}
           <div className="space-y-10">
             <div className="space-y-6">
               <h1 className="font-headline text-5xl font-bold text-primary tracking-tight">상담 문의</h1>
@@ -111,7 +111,6 @@ export default function InquiryPage() {
                 온라인으로 문의를 남겨주시면 담당자가 현장 상황을 검토하여 가장 적합한 보수 방안을 제안해 드립니다.
               </p>
             </div>
-
             <div className="space-y-4">
               <div className="flex items-start gap-4 p-5 bg-white rounded-2xl shadow-sm border border-muted">
                 <div className="bg-primary/10 p-3.5 rounded-xl text-primary">
@@ -133,8 +132,6 @@ export default function InquiryPage() {
               </div>
             </div>
           </div>
-
-          {/* 문의 폼 영역 */}
           <div className="lg:col-span-2">
             <Card className="border-none shadow-2xl rounded-[2rem] overflow-hidden">
               <CardHeader className="bg-primary text-white p-10">
@@ -165,7 +162,6 @@ export default function InquiryPage() {
                       />
                     </div>
                   </div>
-
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-3">
                       <Label htmlFor="email" className="text-sm font-bold text-primary pl-1">이메일</Label>
@@ -197,7 +193,6 @@ export default function InquiryPage() {
                       </Select>
                     </div>
                   </div>
-
                   <div className="space-y-3">
                     <Label htmlFor="content" className="text-sm font-bold text-primary pl-1">문의 내용 *</Label>
                     <Textarea 
@@ -208,7 +203,6 @@ export default function InquiryPage() {
                       onChange={(e) => setFormData({...formData, content: e.target.value})}
                     />
                   </div>
-
                   <Button 
                     type="submit" 
                     className="w-full h-16 bg-accent hover:bg-accent/90 text-xl font-black rounded-2xl shadow-xl shadow-accent/20 transition-all active:scale-[0.98] mt-4"

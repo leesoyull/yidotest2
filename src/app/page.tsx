@@ -30,11 +30,11 @@ export default function Home() {
       </div>
 
       {/* About Section - COMPANY INTRO */}
-      <SectionReveal id="about" className="bg-white py-12 md:py-16">
+      <SectionReveal id="about" className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
-            {/* Left Column: Text Content */}
-            <div className="space-y-6 md:pl-20">
+            {/* Left Column: Text Content (Shifted Right) */}
+            <div className="space-y-8 md:pl-20">
               <div>
                 <RevealItem>
                   <span className="text-accent font-bold text-[10px] tracking-[0.3em] uppercase mb-1 block">Company Intro</span>
@@ -51,7 +51,7 @@ export default function Home() {
                 </RevealItem>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <RevealItem delay={200}>
                   <h3 className="font-bold text-primary text-3xl md:text-4xl tracking-tight leading-tight">
                     이롭고 바른 길을 <br/> 함께 걷겠습니다
@@ -94,7 +94,7 @@ export default function Home() {
       {/* Business Area Section */}
       <SectionReveal id="business" className="bg-background py-24 md:py-32">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-10 space-y-1">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-1">
             <RevealItem>
               <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Business Areas</span>
             </RevealItem>
@@ -114,7 +114,7 @@ export default function Home() {
       {/* Project Status Section */}
       <SectionReveal id="status" className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-10 space-y-1">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-1">
             <RevealItem>
               <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Performance</span>
             </RevealItem>
@@ -129,7 +129,7 @@ export default function Home() {
       {/* Why Yido Section */}
       <SectionReveal id="why" className="bg-background py-24 md:py-32">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-10 space-y-2">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-2">
             <RevealItem>
               <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Why Choose Us</span>
             </RevealItem>
@@ -146,8 +146,8 @@ export default function Home() {
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="space-y-2 text-center md:text-left">
             <RevealItem>
-              <h3 className="font-headline text-3xl md:text-4xl font-bold leading-tight">견적을 의뢰하고 싶으신가요?</h3>
-              <p className="text-white/70 text-base md:text-lg font-light">건물의 안전과 가치를 지키는 이도건설이 함께합니다.</p>
+              <h3 className="font-headline text-4xl md:text-5xl font-bold leading-tight">견적을 의뢰하고 싶으신가요?</h3>
+              <p className="text-white/70 text-lg md:text-xl font-light">건물의 안전과 가치를 지키는 이도건설이 함께합니다.</p>
             </RevealItem>
           </div>
           <div className="flex flex-col items-center md:items-end gap-4">

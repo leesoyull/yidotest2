@@ -58,11 +58,6 @@ export function BusinessGrid() {
           <p className="text-muted-foreground text-sm leading-relaxed group-hover:text-white/70 transition-colors">
             {service.desc}
           </p>
-          <div className="mt-8 pt-6 border-t border-muted group-hover:border-white/10">
-            <button className="text-primary group-hover:text-accent font-bold text-xs tracking-widest flex items-center gap-2 uppercase transition-all">
-              상담 문의 <span className="text-lg">→</span>
-            </button>
-          </div>
         </RevealItem>
       ))}
     </div>

@@ -3,10 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -69,14 +68,6 @@ export function Hero() {
               <p className="text-lg md:text-xl text-white/80 font-light whitespace-pre-line leading-relaxed">
                 {slide.desc}
               </p>
-              <div className="flex flex-wrap gap-4 pt-4">
-                <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 h-14 rounded-full text-md font-bold transition-all transform hover:scale-105 border-none">
-                  <Link href="#business">사업분야 보기</Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10 px-8 h-14 rounded-full text-md font-medium">
-                  <Link href="/inquiry">견적 문의</Link>
-                </Button>
-              </div>
             </div>
           </div>
         </div>

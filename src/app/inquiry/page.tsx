@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Send, Phone, Mail, MapPin } from 'lucide-react';
+import { Send, Mail, MapPin } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -95,15 +95,6 @@ export default function InquiryPage() {
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="bg-primary/10 p-3 rounded-xl text-primary">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm">전화 문의</h4>
-                  <p className="text-muted-foreground text-sm">현장 방문 및 빠른 상담 지원</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-3 rounded-xl text-primary">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
@@ -117,7 +108,7 @@ export default function InquiryPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-sm">방문 지역</h4>
-                  <p className="text-muted-foreground text-sm">경기도 전 지역 현장 방문</p>
+                  <p className="text-muted-foreground text-sm">전국 현장 방문 가능</p>
                 </div>
               </div>
             </div>

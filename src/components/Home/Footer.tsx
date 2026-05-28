@@ -53,16 +53,13 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-accent flex-shrink-0" />
-                <span>경기도 (현장 방문 상담 지원)</span>
+                <span>전국 (현장 방문 상담 지원)</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="py-10 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-sm text-white font-medium">
-            건물의 안전과 가치를 지키는 이도건설입니다.
-          </p>
           <div className="flex gap-6 text-xs text-white/30 uppercase tracking-widest">
             <Link href="#" className="hover:text-white transition-colors">Terms</Link>
             <Link href="#" className="hover:text-white transition-colors">Privacy</Link>

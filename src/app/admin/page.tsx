@@ -32,7 +32,7 @@ export default function AdminPage() {
 
   const [newPortfolio, setNewPortfolio] = useState({
     title: '',
-    category: '',
+    category: '하자보수',
     subText: '',
     year: '2025',
     imageUrl: ''
@@ -45,7 +45,6 @@ export default function AdminPage() {
     }
   }, []);
 
-  // 인덱스 오류를 피하기 위해 orderBy를 제거하고 메모리에서 정렬합니다.
   const inquiryQuery = useMemo(() => {
     if (!db) return null;
     return collection(db, 'inquiries');
@@ -109,8 +108,8 @@ export default function AdminPage() {
           let width = img.width;
           let height = img.height;
 
-          // 홈페이지 표시용으로 최적화된 800px로 리사이징 (Firestore 1MB 제한 대비)
-          const MAX_SIZE = 800;
+          // 데이터 전송 안정성을 위해 가로 600px로 대폭 축소
+          const MAX_SIZE = 600;
           if (width > height) {
             if (width > MAX_SIZE) {
               height *= MAX_SIZE / width;
@@ -132,8 +131,8 @@ export default function AdminPage() {
             ctx.drawImage(img, 0, 0, width, height);
           }
           
-          // 압축률을 0.5로 조정하여 용량 최적화 (Base64 증가분 고려)
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+          // 압축률을 0.4로 더 강화하여 데이터 용량 확보
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
           resolve(dataUrl);
         };
         img.onerror = () => reject(new Error('이미지 로드 실패'));
@@ -153,7 +152,7 @@ export default function AdminPage() {
       try {
         const optimizedImage = await resizeAndCompressImage(file);
         setNewPortfolio(prev => ({ ...prev, imageUrl: optimizedImage }));
-        toast({ title: "이미지 준비 완료", description: "사진이 홈페이지에 최적화되었습니다." });
+        toast({ title: "이미지 준비 완료", description: "사진 최적화가 완료되었습니다." });
       } catch (error) {
         console.error("Image processing error:", error);
         toast({ variant: "destructive", title: "오류 발생", description: "이미지 처리 중 문제가 발생했습니다." });
@@ -170,8 +169,8 @@ export default function AdminPage() {
 
   const handleAddPortfolio = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPortfolio.title || !newPortfolio.category || !newPortfolio.imageUrl || !newPortfolio.year) {
-      toast({ variant: "destructive", title: "입력 부족", description: "필수 항목(*)을 모두 채워주세요." });
+    if (!newPortfolio.title || !newPortfolio.imageUrl) {
+      toast({ variant: "destructive", title: "입력 부족", description: "제목과 사진은 필수입니다." });
       return;
     }
     
@@ -185,10 +184,10 @@ export default function AdminPage() {
       
       await addDoc(colRef, data);
       toast({ title: "등록 완료", description: "시공 사례가 홈페이지에 즉시 반영되었습니다." });
-      setNewPortfolio({ title: '', category: '', subText: '', year: '2025', imageUrl: '' });
+      setNewPortfolio({ title: '', category: '하자보수', subText: '', year: '2025', imageUrl: '' });
     } catch (err) {
       console.error("Firestore Save Error:", err);
-      toast({ variant: "destructive", title: "저장 실패", description: "데이터베이스 연결 문제 또는 용량 오류입니다." });
+      toast({ variant: "destructive", title: "저장 실패", description: "사진 용량이 너무 큽니다. 다른 사진을 시도해 보세요." });
     } finally {
       setIsSubmitting(false);
     }
@@ -229,11 +228,24 @@ export default function AdminPage() {
             <form onSubmit={handleManualLogin} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="adminId">ID</Label>
-                <Input id="adminId" value={adminId} onChange={(e) => setAdminId(e.target.value)} placeholder="yido610" className="h-14 rounded-2xl" />
+                <input 
+                  id="adminId" 
+                  value={adminId} 
+                  onChange={(e) => setAdminId(e.target.value)} 
+                  placeholder="yido610" 
+                  className="flex h-14 w-full rounded-2xl border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="adminPassword">Password</Label>
-                <Input id="adminPassword" type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} placeholder="••••••••" className="h-14 rounded-2xl" />
+                <input 
+                  id="adminPassword" 
+                  type="password" 
+                  value={adminPassword} 
+                  onChange={(e) => setAdminPassword(e.target.value)} 
+                  placeholder="••••••••" 
+                  className="flex h-14 w-full rounded-2xl border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
+                />
               </div>
               <Button type="submit" className="w-full h-16 text-xl font-black rounded-2xl shadow-xl mt-4">로그인하기</Button>
             </form>
@@ -329,7 +341,7 @@ export default function AdminPage() {
             <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
               <CardHeader className="bg-primary text-white p-10">
                 <CardTitle className="text-2xl font-black">새 시공 사례 등록</CardTitle>
-                <CardDescription className="text-white/60">사진을 드래그하거나 선택하세요. 자동으로 최적화되어 홈페이지에 즉시 연동됩니다.</CardDescription>
+                <CardDescription className="text-white/60">사진을 드래그하여 등록하세요. 홈페이지 시공 사례에 즉시 반영됩니다.</CardDescription>
               </CardHeader>
               <CardContent className="p-10">
                 <form onSubmit={handleAddPortfolio} className="grid md:grid-cols-2 gap-10">
@@ -399,7 +411,7 @@ export default function AdminPage() {
                     <div className="flex-1 bg-muted/20 border rounded-3xl flex items-center justify-center relative overflow-hidden min-h-[350px]">
                       {newPortfolio.imageUrl ? (
                         <>
-                          <Image src={newPortfolio.imageUrl} alt="Preview" fill className="object-cover" />
+                          <Image src={newPortfolio.imageUrl} alt="Preview" fill className="object-cover" unoptimized />
                           <Button 
                             type="button" 
                             variant="destructive" 
@@ -429,7 +441,7 @@ export default function AdminPage() {
               {portfolios?.map((item: any) => (
                 <Card key={item.id} className="overflow-hidden border-none shadow-xl rounded-3xl bg-white group">
                   <div className="relative h-60">
-                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" unoptimized />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
                       <Button variant="destructive" size="icon" className="rounded-full w-16 h-16" onClick={() => handleDeletePortfolio(item.id)}>
                         <Trash2 className="w-7 h-7" />

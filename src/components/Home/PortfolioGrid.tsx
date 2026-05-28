@@ -20,7 +20,6 @@ export function PortfolioGrid() {
   const [catFilter, setCatFilter] = useState('전체');
   const [yearFilter, setYearFilter] = useState('전체');
 
-  // 인덱스 오류 방지를 위해 orderBy를 제거하고 메모리에서 정렬합니다.
   const portfolioQuery = useMemo(() => {
     if (!db) return null;
     return collection(db, 'portfolios');
@@ -140,7 +139,7 @@ export function PortfolioGrid() {
       ) : (
         <div className="text-center py-32 bg-muted/20 rounded-[3rem] border-2 border-dashed border-muted">
           <h3 className="text-xl font-bold text-primary">해당 조건의 시공 사례가 없습니다.</h3>
-          <p className="text-sm text-muted-foreground mt-2">다른 필터를 선택하거나 관리자 페이지에서 등록해 보세요.</p>
+          <p className="text-sm text-muted-foreground mt-2">관리자 페이지에서 시공 사례를 등록해 보세요.</p>
         </div>
       )}
     </div>

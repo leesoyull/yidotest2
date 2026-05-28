@@ -10,7 +10,7 @@ import { collection } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
 
 const categories = ['전체', '하자보수', '방수', '도장', '기타'];
-const years = ['전체', '2025', '2026', '2027', '2028', '2029', '2030'];
+const years = ['전체', '2025', '2026'];
 
 export function PortfolioGrid() {
   const db = useFirestore();
@@ -85,7 +85,6 @@ export function PortfolioGrid() {
 
         {/* Year Selector */}
         <div className="flex flex-wrap justify-center gap-2">
-          <span className="w-full text-center text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">시공 연도 선택</span>
           {years.map(yr => (
             <button
               key={yr}
@@ -116,7 +115,7 @@ export function PortfolioGrid() {
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      unoptimized // Base64 이미지의 경우 Next.js 최적화 없이 직접 표시하는 것이 빠를 수 있습니다.
+                      unoptimized 
                     />
                   )}
                   <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">

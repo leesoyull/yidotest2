@@ -27,6 +27,7 @@ export default function AdminPage() {
   const [adminPassword, setAdminPassword] = useState('');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [newPortfolio, setNewPortfolio] = useState({
     title: '',
     category: '',
@@ -76,11 +77,10 @@ export default function AdminPage() {
     toast({ title: "로그아웃 완료" });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const processFile = (file: File) => {
     if (file) {
-      if (file.size > 2 * 1024 * 1024) { // 2MB 제한 (브라우저 메모리/Firestore 용량 고려)
-        toast({ variant: "destructive", title: "용량 초과", description: "2MB 이하의 이미지만 업로드 가능합니다." });
+      if (file.size > 800 * 1024) { // 800KB 제한 (Firestore 1MB 제한 및 Base64 인코딩 고려)
+        toast({ variant: "destructive", title: "용량 초과", description: "800KB 이하의 이미지만 업로드 가능합니다." });
         return;
       }
       const reader = new FileReader();
@@ -89,6 +89,27 @@ export default function AdminPage() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
   };
 
   const handleAddPortfolio = (e: React.FormEvent) => {
@@ -103,7 +124,7 @@ export default function AdminPage() {
     
     addDoc(colRef, data)
       .then(() => {
-        toast({ title: "시공사례 등록 완료" });
+        toast({ title: "시공사례 등록 완료", description: "홈페이지에 즉시 반영되었습니다." });
         setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
       })
       .catch(async () => {
@@ -292,12 +313,19 @@ export default function AdminPage() {
                       <Label className="font-bold text-primary">이미지 업로드 *</Label>
                       <div 
                         onClick={() => fileInputRef.current?.click()}
-                        className="group cursor-pointer border-2 border-dashed border-muted rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-accent hover:bg-accent/5 transition-all"
+                        onDragOver={onDragOver}
+                        onDragLeave={onDragLeave}
+                        onDrop={onDrop}
+                        className={`group cursor-pointer border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all ${
+                          isDragging ? 'border-accent bg-accent/10' : 'border-muted hover:border-accent hover:bg-accent/5'
+                        }`}
                       >
                         <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleImageUpload} />
-                        <Upload className="w-8 h-8 text-muted-foreground group-hover:text-accent group-hover:scale-110 transition-all" />
-                        <p className="text-sm font-bold text-muted-foreground group-hover:text-accent">클릭하여 사진 선택</p>
-                        <p className="text-[10px] text-muted-foreground/50">2MB 이하의 이미지만 권장합니다.</p>
+                        <Upload className={`w-8 h-8 transition-all ${isDragging ? 'text-accent scale-110' : 'text-muted-foreground group-hover:text-accent group-hover:scale-110'}`} />
+                        <p className={`text-sm font-bold transition-all ${isDragging ? 'text-accent' : 'text-muted-foreground group-hover:text-accent'}`}>
+                          {isDragging ? "여기에 놓으세요!" : "사진을 끌어오거나 클릭하세요"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground/50">800KB 이하의 이미지만 권장합니다.</p>
                       </div>
                     </div>
                   </div>

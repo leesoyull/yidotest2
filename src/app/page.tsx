@@ -77,7 +77,7 @@ export default function Home() {
                 {[
                   { title: '정직한 시공', desc: '과장 없이 정확한 견적과 성실한 시공을 약속합니다.' },
                   { title: '꼼꼼한 진단', desc: '근본 원인을 찾아 빈틈 없는 보수를 진행합니다.' },
-                  { title: '책임 시공 보증', desc: '시공 후에도 철저한 사후관리를 보장합니다.' },
+                  { title: '책임 시공 보증', desc: '시공 후에도 하자가 발생하면 책임지고 재보수합니다.' },
                   { title: '신속한 대응', desc: '신속하게 현장을 확인하고 방안을 제안합니다.' },
                 ].map((card, i) => (
                   <RevealItem key={i} delay={i * 100 + 400} className="p-8 bg-muted/20 rounded-[2rem] border border-muted/50 hover:border-accent/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">

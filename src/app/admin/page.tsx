@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, Timestamp } from 'firebase/firestore';
-import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon, Upload, X } from 'lucide-react';
+import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon, Upload, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -27,6 +27,7 @@ export default function AdminPage() {
   const [adminPassword, setAdminPassword] = useState('');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [newPortfolio, setNewPortfolio] = useState({
     title: '',
@@ -77,17 +78,65 @@ export default function AdminPage() {
     toast({ title: "로그아웃 완료" });
   };
 
-  const processFile = (file: File) => {
+  // 이미지 리사이징 및 압축 함수 (Firestore 1MB 제한 준수용)
+  const resizeAndCompressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // 최대 해상도 제한 (가로/세로 중 긴 쪽을 1200px로 조절)
+          const MAX_SIZE = 1200;
+          if (width > height) {
+            if (width > MAX_SIZE) {
+              height *= MAX_SIZE / width;
+              width = MAX_SIZE;
+            }
+          } else {
+            if (height > MAX_SIZE) {
+              width *= MAX_SIZE / height;
+              height = MAX_SIZE;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // JPEG 형식으로 압축 (화질 0.7)
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const processFile = async (file: File) => {
     if (file) {
-      if (file.size > 800 * 1024) { 
-        toast({ variant: "destructive", title: "용량 초과", description: "800KB 이하의 이미지만 업로드 가능합니다." });
+      if (file.size > 10 * 1024 * 1024) { // 10MB 이상은 너무 큼
+        toast({ variant: "destructive", title: "용량 초과", description: "10MB 이하의 이미지만 업로드 가능합니다." });
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewPortfolio({ ...newPortfolio, imageUrl: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+
+      setIsProcessingImage(true);
+      try {
+        const optimizedImage = await resizeAndCompressImage(file);
+        setNewPortfolio({ ...newPortfolio, imageUrl: optimizedImage });
+      } catch (error) {
+        console.error("Image processing error:", error);
+        toast({ variant: "destructive", title: "오류 발생", description: "이미지 처리 중 문제가 발생했습니다." });
+      } finally {
+        setIsProcessingImage(false);
+      }
     }
   };
 
@@ -127,7 +176,8 @@ export default function AdminPage() {
         toast({ title: "시공사례 등록 완료", description: "홈페이지에 즉시 반영되었습니다." });
         setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
       })
-      .catch(async () => {
+      .catch(async (err) => {
+        console.error("Firestore Save Error:", err);
         errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: colRef.path,
           operation: 'create',
@@ -282,7 +332,7 @@ export default function AdminPage() {
             <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
               <CardHeader className="bg-primary text-white p-10">
                 <CardTitle className="text-2xl font-black">새 시공 사례 등록</CardTitle>
-                <CardDescription className="text-white/60">사진을 드래그하거나 선택하여 업로드하세요. 홈페이지에 즉시 반영됩니다.</CardDescription>
+                <CardDescription className="text-white/60">사진을 드래그하거나 선택하여 업로드하세요. 고화질 사진도 자동 최적화됩니다.</CardDescription>
               </CardHeader>
               <CardContent className="p-10">
                 <form onSubmit={handleAddPortfolio} className="grid md:grid-cols-2 gap-10">
@@ -321,11 +371,20 @@ export default function AdminPage() {
                         }`}
                       >
                         <input type="file" hidden ref={fileInputRef} accept="image/*" onChange={handleImageUpload} />
-                        <Upload className={`w-8 h-8 transition-all ${isDragging ? 'text-accent scale-110' : 'text-muted-foreground group-hover:text-accent group-hover:scale-110'}`} />
-                        <p className={`text-sm font-bold transition-all ${isDragging ? 'text-accent' : 'text-muted-foreground group-hover:text-accent'}`}>
-                          {isDragging ? "여기에 놓으세요!" : "사진을 끌어오거나 클릭하세요"}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground/50">800KB 이하의 이미지만 권장합니다.</p>
+                        {isProcessingImage ? (
+                          <>
+                            <Loader2 className="w-8 h-8 text-accent animate-spin" />
+                            <p className="text-sm font-bold text-accent">사진 최적화 중...</p>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className={`w-8 h-8 transition-all ${isDragging ? 'text-accent scale-110' : 'text-muted-foreground group-hover:text-accent group-hover:scale-110'}`} />
+                            <p className={`text-sm font-bold transition-all ${isDragging ? 'text-accent' : 'text-muted-foreground group-hover:text-accent'}`}>
+                              {isDragging ? "여기에 놓으세요!" : "사진을 끌어오거나 클릭하세요 (최대 10MB)"}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/50">1MB~5MB 사진도 자동으로 리사이징하여 저장됩니다.</p>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -351,7 +410,7 @@ export default function AdminPage() {
                         </div>
                       )}
                     </div>
-                    <Button type="submit" className="h-16 text-xl font-black rounded-2xl shadow-xl bg-accent hover:bg-accent/90" disabled={isSubmitting}>
+                    <Button type="submit" className="h-16 text-xl font-black rounded-2xl shadow-xl bg-accent hover:bg-accent/90" disabled={isSubmitting || isProcessingImage}>
                       {isSubmitting ? "처리 중..." : "새 시공 사례 등록"}
                     </Button>
                   </div>

@@ -43,10 +43,11 @@
         "title": { "type": "string", "description": "제목 (예: 아파트 외벽 균열 보수)" },
         "category": { "type": "string", "enum": ["하자보수", "방수", "도장", "기타"], "description": "카테고리" },
         "subText": { "type": "string", "description": "소제목 (예: 공동주택 · 경기도)" },
-        "imageUrl": { "type": "string", "description": "이미지 URL" },
+        "year": { "type": "string", "description": "시공 연도 (예: 2025)" },
+        "imageUrl": { "type": "string", "description": "이미지 URL (Base64)" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "category", "imageUrl"]
+      "required": ["title", "category", "year", "imageUrl"]
     }
   },
   "auth": {

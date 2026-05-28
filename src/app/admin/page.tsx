@@ -10,10 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, Timestamp } from 'firebase/firestore';
-import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon, Upload, X, Loader2 } from 'lucide-react';
+import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon, Upload, X, Loader2, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -29,10 +27,15 @@ export default function AdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => (2025 + i).toString());
+
   const [newPortfolio, setNewPortfolio] = useState({
     title: '',
     category: '',
     subText: '',
+    year: '2025',
     imageUrl: ''
   });
 
@@ -78,7 +81,6 @@ export default function AdminPage() {
     toast({ title: "로그아웃 완료" });
   };
 
-  // 고화질 이미지를 Firestore 1MB 제한에 맞춰 최적화 (Base64 변환 고려하여 약 500-600KB 타겟)
   const resizeAndCompressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -91,7 +93,7 @@ export default function AdminPage() {
           let width = img.width;
           let height = img.height;
 
-          // 긴 쪽을 1024px로 제한 (웹 용도로 충분)
+          // 시공 사례용으로 충분한 1024px로 리사이징
           const MAX_SIZE = 1024;
           if (width > height) {
             if (width > MAX_SIZE) {
@@ -114,7 +116,7 @@ export default function AdminPage() {
             ctx.drawImage(img, 0, 0, width, height);
           }
           
-          // 압축률을 0.6으로 조정하여 용량 안정성 확보
+          // 압축률을 0.5~0.6으로 조정하여 용량 최적화 (Firestore 1MB 제한)
           const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
           resolve(dataUrl);
         };
@@ -134,8 +136,8 @@ export default function AdminPage() {
       setIsProcessingImage(true);
       try {
         const optimizedImage = await resizeAndCompressImage(file);
-        setNewPortfolio({ ...newPortfolio, imageUrl: optimizedImage });
-        toast({ title: "이미지 준비 완료", description: "고화질 사진이 최적화되었습니다." });
+        setNewPortfolio(prev => ({ ...prev, imageUrl: optimizedImage }));
+        toast({ title: "이미지 준비 완료", description: "사진이 최적화되었습니다." });
       } catch (error) {
         console.error("Image processing error:", error);
         toast({ variant: "destructive", title: "오류 발생", description: "이미지 처리 중 문제가 발생했습니다." });
@@ -150,26 +152,10 @@ export default function AdminPage() {
     if (file) processFile(file);
   };
 
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const onDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) processFile(file);
-  };
-
   const handleAddPortfolio = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPortfolio.title || !newPortfolio.category || !newPortfolio.imageUrl) {
-      toast({ variant: "destructive", title: "입력 부족", description: "제목, 카테고리, 이미지는 필수입니다." });
+    if (!newPortfolio.title || !newPortfolio.category || !newPortfolio.imageUrl || !newPortfolio.year) {
+      toast({ variant: "destructive", title: "입력 부족", description: "필수 항목(*)을 모두 채워주세요." });
       return;
     }
     
@@ -182,11 +168,11 @@ export default function AdminPage() {
       };
       
       await addDoc(colRef, data);
-      toast({ title: "등록 완료", description: "시공 사례가 홈페이지에 즉시 반영되었습니다." });
-      setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
+      toast({ title: "등록 완료", description: "시공 사례가 홈페이지에 반영되었습니다." });
+      setNewPortfolio({ title: '', category: '', subText: '', year: '2025', imageUrl: '' });
     } catch (err) {
       console.error("Firestore Save Error:", err);
-      toast({ variant: "destructive", title: "저장 실패", description: "데이터베이스 저장 중 오류가 발생했습니다." });
+      toast({ variant: "destructive", title: "저장 실패", description: "용량이 너무 크거나 오류가 발생했습니다." });
     } finally {
       setIsSubmitting(false);
     }
@@ -210,13 +196,6 @@ export default function AdminPage() {
     } catch (error) {
       toast({ variant: "destructive", title: "삭제 실패" });
     }
-  };
-
-  const formatTimestamp = (ts: any) => {
-    if (!ts) return '방금 전';
-    if (ts instanceof Timestamp) return ts.toDate().toLocaleString('ko-KR');
-    if (ts.toDate) return ts.toDate().toLocaleString('ko-KR');
-    return new Date(ts).toLocaleString('ko-KR');
   };
 
   if (!isLoggedIn) {
@@ -309,15 +288,9 @@ export default function AdminPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-3">
-                          <div className="flex items-center gap-2 text-xs font-black text-muted-foreground/50 bg-muted/50 px-4 py-2 rounded-full">
-                            <Clock className="w-4 h-4" />
-                            {formatTimestamp(iq.createdAt)}
-                          </div>
-                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 h-10 rounded-xl font-black text-xs" onClick={() => handleDeleteInquiry(iq.id)}>
-                            <Trash2 className="w-4 h-4 mr-2" /> 내역 삭제
-                          </Button>
-                        </div>
+                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 h-10 rounded-xl font-black text-xs" onClick={() => handleDeleteInquiry(iq.id)}>
+                          <Trash2 className="w-4 h-4 mr-2" /> 내역 삭제
+                        </Button>
                       </div>
                       <div className="bg-muted/30 p-8 rounded-2xl border border-muted/50">
                         <p className="text-lg leading-relaxed whitespace-pre-line text-primary/80 font-semibold italic">"{iq.content}"</p>
@@ -332,7 +305,6 @@ export default function AdminPage() {
                   <Mail className="w-10 h-10 text-muted-foreground/20" />
                 </div>
                 <h3 className="text-2xl font-black text-primary mb-3">접수된 상담 문의가 없습니다.</h3>
-                <p className="text-muted-foreground font-medium">상담 신청 내용은 영구히 보관됩니다.</p>
               </div>
             )}
           </TabsContent>
@@ -341,7 +313,7 @@ export default function AdminPage() {
             <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
               <CardHeader className="bg-primary text-white p-10">
                 <CardTitle className="text-2xl font-black">새 시공 사례 등록</CardTitle>
-                <CardDescription className="text-white/60">사진을 드래그하거나 선택하여 업로드하세요. 고화질 사진도 자동 최적화됩니다.</CardDescription>
+                <CardDescription className="text-white/60">사진을 드래그하거나 선택하세요. 자동으로 최적화되어 홈페이지에 즉시 연동됩니다.</CardDescription>
               </CardHeader>
               <CardContent className="p-10">
                 <form onSubmit={handleAddPortfolio} className="grid md:grid-cols-2 gap-10">
@@ -350,6 +322,7 @@ export default function AdminPage() {
                       <Label className="font-bold text-primary">시공 제목 *</Label>
                       <Input placeholder="예: 시흥시 아파트 옥상 방수 공사" className="h-14 rounded-xl" value={newPortfolio.title} onChange={(e) => setNewPortfolio({...newPortfolio, title: e.target.value})} />
                     </div>
+                    
                     <div className="grid grid-cols-2 gap-5">
                       <div className="space-y-2">
                         <Label className="font-bold text-primary">카테고리 *</Label>
@@ -364,17 +337,28 @@ export default function AdminPage() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="font-bold text-primary">위치/유형</Label>
-                        <Input placeholder="예: 공동주택 · 경기 시흥" className="h-14 rounded-xl" value={newPortfolio.subText} onChange={(e) => setNewPortfolio({...newPortfolio, subText: e.target.value})} />
+                        <Label className="font-bold text-primary">시공 연도 *</Label>
+                        <Select value={newPortfolio.year} onValueChange={(value) => setNewPortfolio({...newPortfolio, year: value})}>
+                          <SelectTrigger className="h-14 rounded-xl"><SelectValue placeholder="연도 선택" /></SelectTrigger>
+                          <SelectContent>
+                            {years.map(y => <SelectItem key={y} value={y}>{y}년</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
+
+                    <div className="space-y-2">
+                      <Label className="font-bold text-primary">위치/유형 (선택)</Label>
+                      <Input placeholder="예: 공동주택 · 경기 시흥" className="h-14 rounded-xl" value={newPortfolio.subText} onChange={(e) => setNewPortfolio({...newPortfolio, subText: e.target.value})} />
+                    </div>
+
                     <div className="space-y-2">
                       <Label className="font-bold text-primary">이미지 업로드 *</Label>
                       <div 
                         onClick={() => fileInputRef.current?.click()}
-                        onDragOver={onDragOver}
-                        onDragLeave={onDragLeave}
-                        onDrop={onDrop}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files?.[0]; if(f) processFile(f); }}
                         className={`group cursor-pointer border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all ${
                           isDragging ? 'border-accent bg-accent/10' : 'border-muted hover:border-accent hover:bg-accent/5'
                         }`}
@@ -383,22 +367,20 @@ export default function AdminPage() {
                         {isProcessingImage ? (
                           <>
                             <Loader2 className="w-8 h-8 text-accent animate-spin" />
-                            <p className="text-sm font-bold text-accent">사진 최적화 중...</p>
+                            <p className="text-sm font-bold text-accent">이미지 최적화 중...</p>
                           </>
                         ) : (
                           <>
-                            <Upload className={`w-8 h-8 transition-all ${isDragging ? 'text-accent scale-110' : 'text-muted-foreground group-hover:text-accent group-hover:scale-110'}`} />
-                            <p className={`text-sm font-bold transition-all ${isDragging ? 'text-accent' : 'text-muted-foreground group-hover:text-accent'}`}>
-                              {isDragging ? "여기에 놓으세요!" : "사진을 끌어오거나 클릭하세요"}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground/50">고화질 사진(1~5MB)도 자동으로 압축되어 저장됩니다.</p>
+                            <Upload className={`w-8 h-8 text-muted-foreground group-hover:text-accent`} />
+                            <p className="text-sm font-bold text-muted-foreground group-hover:text-accent">클릭하거나 사진을 끌어오세요</p>
                           </>
                         )}
                       </div>
                     </div>
                   </div>
+                  
                   <div className="flex flex-col justify-between gap-5">
-                    <div className="flex-1 bg-muted/20 border rounded-3xl flex items-center justify-center relative overflow-hidden min-h-[300px] border-muted">
+                    <div className="flex-1 bg-muted/20 border rounded-3xl flex items-center justify-center relative overflow-hidden min-h-[350px]">
                       {newPortfolio.imageUrl ? (
                         <>
                           <Image src={newPortfolio.imageUrl} alt="Preview" fill className="object-cover" />
@@ -406,7 +388,7 @@ export default function AdminPage() {
                             type="button" 
                             variant="destructive" 
                             size="icon" 
-                            className="absolute top-4 right-4 rounded-full w-10 h-10 shadow-lg"
+                            className="absolute top-4 right-4 rounded-full w-10 h-10"
                             onClick={() => setNewPortfolio({...newPortfolio, imageUrl: ''})}
                           >
                             <X className="w-5 h-5" />
@@ -415,12 +397,12 @@ export default function AdminPage() {
                       ) : (
                         <div className="text-center space-y-2">
                           <ImageIcon className="w-16 h-16 text-muted/20 mx-auto" />
-                          <p className="text-xs text-muted-foreground font-bold">이미지 미리보기</p>
+                          <p className="text-xs text-muted-foreground font-bold">미리보기</p>
                         </div>
                       )}
                     </div>
                     <Button type="submit" className="h-16 text-xl font-black rounded-2xl shadow-xl bg-accent hover:bg-accent/90" disabled={isSubmitting || isProcessingImage}>
-                      {isSubmitting ? "처리 중..." : "새 시공 사례 등록"}
+                      {isSubmitting ? "저장 중..." : "시공 사례 등록"}
                     </Button>
                   </div>
                 </form>
@@ -429,13 +411,16 @@ export default function AdminPage() {
             
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {portfolios?.map((item: any) => (
-                <Card key={item.id} className="overflow-hidden border-none shadow-xl rounded-3xl bg-white group animate-in fade-in zoom-in duration-300">
+                <Card key={item.id} className="overflow-hidden border-none shadow-xl rounded-3xl bg-white group">
                   <div className="relative h-60">
                     <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
-                      <Button variant="destructive" size="icon" className="rounded-full w-16 h-16 shadow-2xl" onClick={() => handleDeletePortfolio(item.id)}>
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                      <Button variant="destructive" size="icon" className="rounded-full w-16 h-16" onClick={() => handleDeletePortfolio(item.id)}>
                         <Trash2 className="w-7 h-7" />
                       </Button>
+                    </div>
+                    <div className="absolute top-4 left-4 bg-primary/90 text-white text-[10px] font-black px-3 py-1 rounded-full">
+                      {item.year}년
                     </div>
                   </div>
                   <CardContent className="p-6">

@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -33,12 +33,13 @@ export function Navbar() {
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary p-1 rounded-sm">
-             <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zM12 8.5L16.5 13H15v5h-2v-5h-2v5H9v-5H7.5L12 8.5z" />
-             </svg>
+          <div className="bg-primary p-1.5 rounded-lg text-white">
+            <Building2 className="w-6 h-6" />
           </div>
-          <span className="font-headline font-bold text-2xl tracking-tight text-primary">
+          <span className={cn(
+            "font-headline font-bold text-2xl tracking-tight transition-colors",
+            scrolled ? "text-primary" : "text-white"
+          )}>
             이도건설
           </span>
         </Link>

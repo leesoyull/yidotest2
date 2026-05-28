@@ -31,28 +31,28 @@ export default function Home() {
       </div>
 
       {/* About Section - COMPANY INTRO */}
-      <SectionReveal id="about" className="bg-white py-48 md:py-64">
+      <SectionReveal id="about" className="bg-white py-64 md:py-80">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-24 items-start">
-            <div className="space-y-32">
+            <div className="space-y-40">
               <div>
                 <RevealItem>
-                  <span className="text-accent font-bold text-xs tracking-[0.3em] uppercase mb-16 block">Company Intro</span>
+                  <span className="text-accent font-bold text-xs tracking-[0.3em] uppercase mb-24 block">Company Intro</span>
                 </RevealItem>
                 <RevealItem delay={100}>
-                  <h2 className="font-brush text-primary leading-none flex flex-row items-baseline gap-8 mt-12">
-                    <span className="text-[14rem] font-black tracking-tighter">이도</span>
+                  <h2 className="font-brush text-primary leading-none flex flex-row items-baseline gap-10 mt-16">
+                    <span className="text-[18rem] font-black tracking-tighter">이도</span>
                     <span className="text-5xl font-bold opacity-30">(利道)</span>
                   </h2>
                 </RevealItem>
               </div>
 
               <RevealItem delay={200}>
-                <div className="space-y-16 text-muted-foreground text-lg leading-relaxed">
-                  <p className="font-bold text-primary text-3xl">
+                <div className="space-y-20 text-muted-foreground text-lg leading-relaxed">
+                  <p className="font-bold text-primary text-4xl">
                     이롭고 바른 길을 함께 걷겠습니다
                   </p>
-                  <div className="space-y-8 text-base font-normal max-w-xl">
+                  <div className="space-y-10 text-base font-normal max-w-xl">
                     <p>
                       이도건설의 사명 <span className="text-primary font-bold">'이도(利道)'</span>는 <span className="text-accent font-bold">'이로울 이(利)'</span>와 <span className="text-accent font-bold">'길 도(道)'</span>로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 진심을 담고 있습니다.
                     </p>
@@ -63,16 +63,16 @@ export default function Home() {
                 </div>
               </RevealItem>
 
-              <RevealItem delay={300} className="pt-20">
-                <Button asChild size="lg" className="h-16 px-16 rounded-full bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 text-xl font-black">
+              <RevealItem delay={300} className="pt-32">
+                <Button asChild size="lg" className="h-20 px-20 rounded-full bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 text-2xl font-black transition-all hover:scale-105">
                   <Link href="/inquiry" className="flex items-center gap-3">
-                    상담 문의하기 <ArrowRight className="w-6 h-6" />
+                    상담 문의하기 <ArrowRight className="w-8 h-8" />
                   </Link>
                 </Button>
               </RevealItem>
             </div>
             
-            <div className="grid sm:grid-cols-2 gap-8 lg:mt-48">
+            <div className="grid sm:grid-cols-2 gap-8 lg:mt-64">
               {[
                 { title: '정직한 시공', desc: '과장 없이 정확한 견적과 성실한 시공을 약속합니다.' },
                 { title: '꼼꼼한 진단', desc: '근본 원인을 찾아 재발 없는 보수를 진행합니다.' },
@@ -90,9 +90,9 @@ export default function Home() {
       </SectionReveal>
 
       {/* Business Area Section */}
-      <SectionReveal id="business" className="bg-background py-40 md:py-56">
+      <SectionReveal id="business" className="bg-background py-48 md:py-64">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-24 space-y-6">
+          <div className="text-center max-w-3xl mx-auto mb-32 space-y-6">
             <RevealItem>
               <span className="text-accent font-bold text-xs tracking-widest uppercase">Business Areas</span>
             </RevealItem>
@@ -111,9 +111,9 @@ export default function Home() {
       </SectionReveal>
 
       {/* Project Status Section */}
-      <SectionReveal id="status" className="bg-white py-40 md:py-56">
+      <SectionReveal id="status" className="bg-white py-48 md:py-64">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-20 space-y-6">
+          <div className="text-center max-w-3xl mx-auto mb-24 space-y-6">
             <RevealItem>
               <span className="text-accent font-bold text-xs tracking-widest uppercase">Performance</span>
             </RevealItem>
@@ -130,10 +130,10 @@ export default function Home() {
         </div>
       </SectionReveal>
 
-      {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-background py-48 md:py-64">
+      {/* Why Yido Section - Increased Spacing */}
+      <SectionReveal id="why" className="bg-background py-64 md:py-80">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-32 space-y-8">
+          <div className="text-center max-w-3xl mx-auto mb-40 space-y-10">
             <RevealItem>
               <span className="text-accent font-bold text-xs tracking-widest uppercase">Why Choose Us</span>
             </RevealItem>
@@ -146,7 +146,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* CTA Band */}
-      <SectionReveal id="contact" className="bg-primary text-white py-40">
+      <SectionReveal id="contact" className="bg-primary text-white py-48">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-16">
           <div className="space-y-8">
             <RevealItem>
@@ -162,7 +162,7 @@ export default function Home() {
               </div>
             </RevealItem>
             <RevealItem delay={200}>
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-18 px-16 rounded-full text-2xl font-black transition-all shadow-2xl">
+              <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-20 px-16 rounded-full text-2xl font-black transition-all shadow-2xl">
                 <Link href="/inquiry">지금 바로 문의하기</Link>
               </Button>
             </RevealItem>

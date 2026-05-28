@@ -7,9 +7,9 @@ import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
-    <footer className="bg-[#0d1f35] text-white/80 pt-8 pb-4">
+    <footer className="bg-[#0d1f35] text-white/80 pt-10 pb-6">
       <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-8 pb-6 border-b border-white/5 items-center">
+        <div className="grid md:grid-cols-2 gap-8 pb-8 border-b border-white/5 items-center">
           <div className="space-y-4">
             <Link href="/">
               <Logo variant="light" />

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function Navbar() {
-  const inquiryLink = "http://www.kumyoungenc.com/pc/customer/customer04.php";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -21,10 +20,10 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: '회사소개', href: '#about', sub: ['인사말', '연혁', '경영방침'] },
-    { name: '사업분야', href: '#business', sub: ['하자보수', '방수공사', '도장공사', '시설관리'] },
-    { name: '시공사례', href: '#portfolio', sub: ['전체보기', '방수', '도장'] },
-    { name: '문의하기', href: '#contact', sub: ['견적요청', '상담신청'] },
+    { name: '회사소개', href: '/#about', sub: ['인사말', '연혁', '경영방침'] },
+    { name: '사업분야', href: '/#business', sub: ['하자보수', '방수공사', '도장공사', '시설관리'] },
+    { name: '시공사례', href: '/#portfolio', sub: ['전체보기', '방수', '도장'] },
+    { name: '문의하기', href: '/inquiry', sub: ['견적요청', '상담신청'] },
   ];
 
   return (
@@ -71,7 +70,7 @@ export function Navbar() {
             </div>
           ))}
           <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold rounded-full px-6 border-none">
-            <Link href={inquiryLink}>무료 견적 받기</Link>
+            <Link href="/inquiry">무료 견적 받기</Link>
           </Button>
         </div>
 
@@ -95,7 +94,7 @@ export function Navbar() {
             </Link>
           ))}
           <Button className="w-full rounded-full" asChild onClick={() => setIsOpen(false)}>
-            <Link href={inquiryLink}>무료 견적 받기</Link>
+            <Link href="/inquiry">무료 견적 받기</Link>
           </Button>
         </div>
       )}

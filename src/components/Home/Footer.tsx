@@ -27,20 +27,20 @@ export function Footer() {
           <div>
             <h4 className="font-headline text-white font-bold text-sm tracking-widest mb-8 border-b border-white/10 pb-2">COMPANY</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link href="#about" className="hover:text-accent transition-colors">회사소개</Link></li>
-              <li><Link href="#about" className="hover:text-accent transition-colors">인사말</Link></li>
-              <li><Link href="#about" className="hover:text-accent transition-colors">회사연혁</Link></li>
-              <li><Link href="#why" className="hover:text-accent transition-colors">경영방침</Link></li>
+              <li><Link href="/#about" className="hover:text-accent transition-colors">회사소개</Link></li>
+              <li><Link href="/#about" className="hover:text-accent transition-colors">인사말</Link></li>
+              <li><Link href="/#about" className="hover:text-accent transition-colors">회사연혁</Link></li>
+              <li><Link href="/#why" className="hover:text-accent transition-colors">경영방침</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-headline text-white font-bold text-sm tracking-widest mb-8 border-b border-white/10 pb-2">SERVICES</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link href="#business" className="hover:text-accent transition-colors">건물 하자보수</Link></li>
-              <li><Link href="#business" className="hover:text-accent transition-colors">시설물 유지관리</Link></li>
-              <li><Link href="#business" className="hover:text-accent transition-colors">방수 공사</Link></li>
-              <li><Link href="#business" className="hover:text-accent transition-colors">도장 공사</Link></li>
+              <li><Link href="/#business" className="hover:text-accent transition-colors">건물 하자보수</Link></li>
+              <li><Link href="/#business" className="hover:text-accent transition-colors">시설물 유지관리</Link></li>
+              <li><Link href="/#business" className="hover:text-accent transition-colors">방수 공사</Link></li>
+              <li><Link href="/#business" className="hover:text-accent transition-colors">도장 공사</Link></li>
             </ul>
           </div>
 

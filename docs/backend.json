@@ -1,0 +1,49 @@
+
+{
+  "entities": {
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Customer inquiry for building maintenance and repair services",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the customer"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact email address"
+        },
+        "serviceType": {
+          "type": "string",
+          "enum": ["하자보수", "방수공사", "도장공사", "시설관리", "기타"],
+          "description": "The type of service requested"
+        },
+        "content": {
+          "type": "string",
+          "description": "Detailed description of the inquiry"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the inquiry was created"
+        }
+      },
+      "required": ["name", "phone", "serviceType", "content"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com"]
+  },
+  "firestore": {
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Collection of customer inquiries"
+    }
+  }
+}

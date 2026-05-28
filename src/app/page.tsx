@@ -11,8 +11,6 @@ import { CheckCircle2, Mail, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
-  const inquiryLink = "http://www.kumyoungenc.com/pc/customer/customer04.php";
-
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -54,7 +52,7 @@ export default function Home() {
               </RevealItem>
               <RevealItem delay={200}>
                 <Button asChild size="lg" className="h-14 px-8 rounded-full bg-primary hover:bg-primary/90">
-                  <Link href={inquiryLink} className="flex items-center gap-2">
+                  <Link href="/inquiry" className="flex items-center gap-2">
                     상담 문의하기 <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
@@ -132,7 +130,7 @@ export default function Home() {
             </RevealItem>
             <RevealItem delay={200}>
               <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-16 px-10 rounded-full text-lg font-black transition-all">
-                <Link href={inquiryLink}>지금 바로 문의하기</Link>
+                <Link href="/inquiry">지금 바로 문의하기</Link>
               </Button>
             </RevealItem>
           </div>

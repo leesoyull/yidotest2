@@ -13,6 +13,7 @@ export function ProjectStatus() {
 
   const portfolioCount = useMemo(() => portfolios?.length || 0, [portfolios]);
   
+  // 2025년(12건) + 2026년(8건) + 관리자 등록 건수
   const totalCumulativeCount = useMemo(() => 12 + 8 + portfolioCount, [portfolioCount]);
 
   const stats = [

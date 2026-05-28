@@ -36,10 +36,6 @@ export function Footer() {
           <div className="text-[9px] text-white/30 uppercase tracking-widest">
             &copy; {new Date().getFullYear()} YIDO CONSTRUCTION. ALL RIGHTS RESERVED.
           </div>
-          <div className="flex gap-4 text-[9px] text-white/30 uppercase tracking-widest">
-            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-          </div>
         </div>
       </div>
     </footer>

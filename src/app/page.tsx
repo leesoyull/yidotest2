@@ -6,7 +6,7 @@ import { StatsBand } from '@/components/Home/StatsBand';
 import { ProjectStatus } from '@/components/Home/ProjectStatus';
 import { Footer } from '@/components/Home/Footer';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Mail, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -33,7 +33,7 @@ export default function Home() {
       <SectionReveal id="about" className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
-            {/* Left Column: Text Content (Shifted Right) */}
+            {/* Left Column: Text Content */}
             <div className="space-y-8 md:pl-20">
               <div>
                 <RevealItem>

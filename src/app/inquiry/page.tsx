@@ -30,6 +30,8 @@ export default function InquiryPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 필수 항목 유효성 검사
     if (!formData.name || !formData.phone || !formData.serviceType || !formData.content) {
       toast({
         variant: "destructive",
@@ -42,46 +44,51 @@ export default function InquiryPage() {
     setLoading(true);
     
     try {
-      // 1. Firestore에 저장 (관리자 대시보드에서 즉시 확인 가능)
+      // 1. Firestore 'inquiries' 컬렉션에 데이터 저장
       const inquiriesRef = collection(db, 'inquiries');
       await addDoc(inquiriesRef, {
         ...formData,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp() // 접수 시간 자동 기록
       });
 
+      // 2. 전송 완료 상태 고지 (UI 전환)
       setSubmitted(true);
+      
       toast({
-        title: "접수 완료",
-        description: "문의 내용이 성공적으로 전달되었습니다.",
+        title: "상담 신청 완료",
+        description: "담당자가 확인 후 신속하게 연락드리겠습니다.",
       });
     } catch (err: any) {
-      console.error(err);
+      console.error("Firestore Save Error:", err);
       toast({
         variant: "destructive",
         title: "접수 실패",
-        description: "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        description: "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
       });
     } finally {
       setLoading(false);
     }
   };
 
+  // 전송 완료 후 보여줄 화면
   if (submitted) {
     return (
       <main className="min-h-screen bg-muted/30">
         <Navbar />
-        <div className="pt-40 pb-32 container mx-auto px-6 text-center">
-          <div className="max-w-md mx-auto bg-white p-10 rounded-3xl shadow-xl space-y-6">
-            <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-green-600">
-              <CheckCircle2 className="w-10 h-10" />
+        <div className="pt-48 pb-32 container mx-auto px-6 text-center">
+          <div className="max-w-md mx-auto bg-white p-12 rounded-[2.5rem] shadow-2xl space-y-8 animate-in fade-in zoom-in duration-500">
+            <div className="bg-green-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto text-green-600 shadow-inner">
+              <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h2 className="text-3xl font-black text-primary">접수되었습니다!</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              보내주신 소중한 문의 내용이 성공적으로 접수되었습니다.<br/>
-              확인 후 신속하게 연락드리겠습니다.
-            </p>
-            <Button asChild className="w-full h-14 text-lg font-bold rounded-xl" variant="default">
-              <a href="/">홈으로 돌아가기</a>
+            <div className="space-y-3">
+              <h2 className="text-3xl font-black text-primary">신청이 완료되었습니다!</h2>
+              <p className="text-muted-foreground leading-relaxed font-medium">
+                보내주신 상담 문의가 성공적으로 접수되었습니다.<br/>
+                기재하신 연락처로 신속하게 연락드리겠습니다.
+              </p>
+            </div>
+            <Button asChild className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg" variant="default">
+              <a href="/">메인으로 돌아가기</a>
             </Button>
           </div>
         </div>
@@ -93,91 +100,91 @@ export default function InquiryPage() {
   return (
     <main className="min-h-screen bg-muted/30">
       <Navbar />
-      <div className="pt-32 pb-16 container mx-auto px-6">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-3 gap-10">
-          {/* Contact Info */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="font-headline text-4xl font-bold text-primary mb-3">상담 문의</h1>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+      <div className="pt-40 pb-20 container mx-auto px-6">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-3 gap-12">
+          {/* 안내 정보 영역 */}
+          <div className="space-y-10">
+            <div className="space-y-6">
+              <h1 className="font-headline text-5xl font-bold text-primary tracking-tight">상담 문의</h1>
+              <p className="text-muted-foreground text-sm leading-relaxed font-medium">
                 건물의 안전과 가치를 지키는 이도건설입니다. <br/>
-                온라인 문의 시 담당자가 내용을 확인하여 신속하게 연락드리겠습니다.
+                온라인으로 문의를 남겨주시면 담당자가 현장 상황을 검토하여 가장 적합한 보수 방안을 제안해 드립니다.
               </p>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm">
-                <div className="bg-primary/10 p-3 rounded-xl text-primary">
-                  <Mail className="w-5 h-5" />
+              <div className="flex items-start gap-4 p-5 bg-white rounded-2xl shadow-sm border border-muted">
+                <div className="bg-primary/10 p-3.5 rounded-xl text-primary">
+                  <Mail className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-xs text-primary/50 uppercase tracking-wider mb-1">이메일 문의</h4>
-                  <p className="text-primary font-bold">yido610@naver.com</p>
+                  <h4 className="font-bold text-xs text-primary/40 uppercase tracking-widest mb-1">이메일 문의</h4>
+                  <p className="text-primary font-black text-lg">yido610@naver.com</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-4 bg-white rounded-2xl shadow-sm">
-                <div className="bg-primary/10 p-3 rounded-xl text-primary">
-                  <MapPin className="w-5 h-5" />
+              <div className="flex items-start gap-4 p-5 bg-white rounded-2xl shadow-sm border border-muted">
+                <div className="bg-primary/10 p-3.5 rounded-xl text-primary">
+                  <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-xs text-primary/50 uppercase tracking-wider mb-1">방문 상담</h4>
-                  <p className="text-primary font-bold">전국 현장 방문 가능</p>
+                  <h4 className="font-bold text-xs text-primary/40 uppercase tracking-widest mb-1">상담 지원</h4>
+                  <p className="text-primary font-black text-lg">전국 현장 방문 가능</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Form */}
+          {/* 문의 폼 영역 */}
           <div className="lg:col-span-2">
-            <Card className="border-none shadow-2xl rounded-3xl overflow-hidden">
-              <CardHeader className="bg-primary text-white p-8">
+            <Card className="border-none shadow-2xl rounded-[2rem] overflow-hidden">
+              <CardHeader className="bg-primary text-white p-10">
                 <CardTitle className="text-2xl font-bold">견적 및 상담 신청</CardTitle>
-                <CardDescription className="text-white/70">정확한 정보를 입력해주시면 더욱 빠른 상담이 가능합니다.</CardDescription>
+                <CardDescription className="text-white/70 text-base">내용을 자세히 적어주시면 더욱 정확한 가견적이 가능합니다.</CardDescription>
               </CardHeader>
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-bold text-primary">성함/업체명 *</Label>
+              <CardContent className="p-10">
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <Label htmlFor="name" className="text-sm font-bold text-primary pl-1">성함/업체명 *</Label>
                       <Input 
                         id="name" 
                         placeholder="이름을 입력해 주세요" 
-                        className="h-12 rounded-xl"
+                        className="h-14 rounded-xl border-muted bg-muted/20 focus:bg-white transition-all"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-sm font-bold text-primary">연락처 *</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="phone" className="text-sm font-bold text-primary pl-1">연락처 *</Label>
                       <Input 
                         id="phone" 
                         placeholder="010-0000-0000" 
-                        className="h-12 rounded-xl"
+                        className="h-14 rounded-xl border-muted bg-muted/20 focus:bg-white transition-all"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                       />
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-bold text-primary">이메일</Label>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <Label htmlFor="email" className="text-sm font-bold text-primary pl-1">이메일</Label>
                       <Input 
                         id="email" 
                         type="email" 
                         placeholder="example@email.com" 
-                        className="h-12 rounded-xl"
+                        className="h-14 rounded-xl border-muted bg-muted/20 focus:bg-white transition-all"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="serviceType" className="text-sm font-bold text-primary">문의 분야 *</Label>
+                    <div className="space-y-3">
+                      <Label htmlFor="serviceType" className="text-sm font-bold text-primary pl-1">문의 분야 *</Label>
                       <Select 
                         onValueChange={(value) => setFormData({...formData, serviceType: value})}
                         value={formData.serviceType}
                       >
-                        <SelectTrigger id="serviceType" className="h-12 rounded-xl">
+                        <SelectTrigger id="serviceType" className="h-14 rounded-xl border-muted bg-muted/20 focus:bg-white transition-all">
                           <SelectValue placeholder="분야를 선택해 주세요" />
                         </SelectTrigger>
                         <SelectContent>
@@ -191,12 +198,12 @@ export default function InquiryPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="content" className="text-sm font-bold text-primary">문의 내용 *</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="content" className="text-sm font-bold text-primary pl-1">문의 내용 *</Label>
                     <Textarea 
                       id="content" 
-                      placeholder="공사 내용, 지역, 건물 유형 등을 자세히 적어주시면 정확한 상담이 가능합니다." 
-                      className="min-h-[180px] rounded-xl p-4"
+                      placeholder="공사 희망 내용, 지역, 건물 유형 등을 기재해 주세요." 
+                      className="min-h-[200px] rounded-2xl p-5 border-muted bg-muted/20 focus:bg-white transition-all resize-none"
                       value={formData.content}
                       onChange={(e) => setFormData({...formData, content: e.target.value})}
                     />
@@ -204,18 +211,18 @@ export default function InquiryPage() {
 
                   <Button 
                     type="submit" 
-                    className="w-full h-14 bg-accent hover:bg-accent/90 text-lg font-black rounded-xl shadow-xl shadow-accent/20 transition-all active:scale-[0.98]"
+                    className="w-full h-16 bg-accent hover:bg-accent/90 text-xl font-black rounded-2xl shadow-xl shadow-accent/20 transition-all active:scale-[0.98] mt-4"
                     disabled={loading}
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                        상담 요청 전송 중...
+                        <Loader2 className="mr-3 w-6 h-6 animate-spin" />
+                        처리 중입니다...
                       </>
                     ) : (
                       <>
                         상담 신청하기
-                        <Send className="ml-2 w-5 h-5" />
+                        <Send className="ml-3 w-6 h-6" />
                       </>
                     )}
                   </Button>

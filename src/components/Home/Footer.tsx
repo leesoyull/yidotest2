@@ -7,39 +7,39 @@ import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
-    <footer className="bg-[#0d1f35] text-white/80 pt-10 pb-6">
+    <footer className="bg-[#0d1f35] text-white/80 py-8">
       <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-8 pb-8 border-b border-white/5 items-center">
-          <div className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="space-y-3">
             <Link href="/">
-              <Logo variant="light" />
+              <Logo variant="light" className="scale-90 origin-left" />
             </Link>
-            <div className="text-[10px] font-bold text-white/40 tracking-[0.2em] pl-1 uppercase">
+            <div className="text-[11px] font-bold text-white/40 tracking-[0.2em] pl-1 uppercase">
               CEO : LEE SOYUL
             </div>
           </div>
 
           <div className="md:text-right">
-            <ul className="space-y-2 text-xs flex flex-col md:items-end">
-              <li className="flex items-start gap-3 justify-end">
-                <Mail className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+            <ul className="space-y-1.5 text-xs flex flex-col md:items-end">
+              <li className="flex items-center gap-2 justify-end">
+                <Mail className="w-3.5 h-3.5 text-accent" />
                 <a href="mailto:yido610@naver.com" className="hover:text-white transition-colors">yido610@naver.com</a>
               </li>
-              <li className="flex items-start gap-3 justify-end">
-                <MapPin className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                <span>전국 (현장 방문 상담 지원)</span>
+              <li className="flex items-center gap-2 justify-end">
+                <MapPin className="w-3.5 h-3.5 text-accent" />
+                <span>전국 현장 방문 상담 지원</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="py-4 flex flex-col md:flex-row justify-between items-center gap-2">
-          <div className="flex gap-4 text-[9px] text-white/30 uppercase tracking-widest">
-            <span>&copy; {new Date().getFullYear()} YIDO CONSTRUCTION. ALL RIGHTS RESERVED.</span>
+        <div className="mt-8 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-2">
+          <div className="text-[9px] text-white/30 uppercase tracking-widest">
+            &copy; {new Date().getFullYear()} YIDO CONSTRUCTION. ALL RIGHTS RESERVED.
           </div>
-          <div className="flex gap-6 text-[9px] text-white/30 uppercase tracking-widest">
-            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+          <div className="flex gap-4 text-[9px] text-white/30 uppercase tracking-widest">
+            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
           </div>
         </div>
       </div>

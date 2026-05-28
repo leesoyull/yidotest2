@@ -12,7 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, Timestamp } from 'firebase/firestore';
 import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon, Upload, X, Loader2, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function AdminPage() {
@@ -411,7 +410,7 @@ export default function AdminPage() {
                     <div className="flex-1 bg-muted/20 border rounded-3xl flex items-center justify-center relative overflow-hidden min-h-[350px]">
                       {newPortfolio.imageUrl ? (
                         <>
-                          <Image src={newPortfolio.imageUrl} alt="Preview" fill className="object-cover" unoptimized />
+                          <img src={newPortfolio.imageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
                           <Button 
                             type="button" 
                             variant="destructive" 
@@ -441,7 +440,7 @@ export default function AdminPage() {
               {portfolios?.map((item: any) => (
                 <Card key={item.id} className="overflow-hidden border-none shadow-xl rounded-3xl bg-white group">
                   <div className="relative h-60">
-                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" unoptimized />
+                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
                       <Button variant="destructive" size="icon" className="rounded-full w-16 h-16" onClick={() => handleDeletePortfolio(item.id)}>
                         <Trash2 className="w-7 h-7" />

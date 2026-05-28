@@ -2,7 +2,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { RevealItem } from '../SectionReveal';
@@ -108,13 +107,10 @@ export function PortfolioGrid() {
               <div className="bg-white rounded-3xl overflow-hidden border shadow-sm group-hover:shadow-xl transition-all duration-500">
                 <div className="relative h-64 overflow-hidden bg-muted/20">
                   {work.imageUrl && (
-                    <Image
+                    <img
                       src={work.imageUrl}
                       alt={work.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      unoptimized 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   )}
                   <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">

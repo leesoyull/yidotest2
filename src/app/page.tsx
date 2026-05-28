@@ -5,7 +5,6 @@ import { SectionReveal, RevealItem } from '@/components/SectionReveal';
 import { BusinessGrid } from '@/components/Home/BusinessGrid';
 import { StatsBand } from '@/components/Home/StatsBand';
 import { ProjectStatus } from '@/components/Home/ProjectStatus';
-import { PortfolioGrid } from '@/components/Home/PortfolioGrid';
 import { Footer } from '@/components/Home/Footer';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, Mail, ArrowRight } from 'lucide-react';
@@ -113,35 +112,8 @@ export default function Home() {
         </div>
       </SectionReveal>
 
-      {/* Latest Portfolios Section - 추가된 실시간 연동 섹션 */}
-      <SectionReveal id="recent-work" className="bg-white py-24 md:py-32 border-y border-muted">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div className="space-y-1">
-              <RevealItem>
-                <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Latest Projects</span>
-              </RevealItem>
-              <RevealItem delay={100}>
-                <h2 className="font-headline text-3xl md:text-4xl font-bold">최근 시공 사례</h2>
-              </RevealItem>
-              <RevealItem delay={200}>
-                <p className="text-muted-foreground text-sm font-light">관리자 페이지에서 등록한 최신 현장 리스트입니다.</p>
-              </RevealItem>
-            </div>
-            <RevealItem delay={300}>
-              <Button asChild variant="ghost" className="text-primary font-black hover:text-accent group">
-                <Link href="/portfolio" className="flex items-center gap-2">
-                  전체 사례 보기 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-            </RevealItem>
-          </div>
-          <PortfolioGrid />
-        </div>
-      </SectionReveal>
-
       {/* Project Status Section */}
-      <SectionReveal id="status" className="bg-background py-24 md:py-32">
+      <SectionReveal id="status" className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-1">
             <RevealItem>
@@ -156,7 +128,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-white py-24 md:py-32">
+      <SectionReveal id="why" className="bg-background py-24 md:py-32">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-2">
             <RevealItem>

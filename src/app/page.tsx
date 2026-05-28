@@ -31,14 +31,14 @@ export default function Home() {
       </div>
 
       {/* About Section */}
-      <SectionReveal id="about" className="bg-white py-32">
+      <SectionReveal id="about" className="bg-white py-40">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <div className="space-y-10">
+            <div className="space-y-12">
               <RevealItem>
-                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-4 block">Company Intro</span>
-                <h2 className="font-brush text-7xl md:text-8xl text-primary leading-tight">
-                  이도 <span className="text-3xl md:text-4xl font-normal ml-2 opacity-80">(利道)</span>
+                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-8 block">Company Intro</span>
+                <h2 className="font-brush text-8xl text-primary leading-tight">
+                  이도 <span className="text-4xl font-normal ml-2 opacity-80">(利道)</span>
                 </h2>
               </RevealItem>
               <RevealItem delay={100}>
@@ -56,7 +56,7 @@ export default function Home() {
                   </div>
                 </div>
               </RevealItem>
-              <RevealItem delay={200} className="pt-6">
+              <RevealItem delay={200} className="pt-16">
                 <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
                   <Link href="/inquiry" className="flex items-center gap-2">
                     상담 문의하기 <ArrowRight className="w-4 h-4" />
@@ -83,7 +83,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* Business Area Section */}
-      <SectionReveal id="business" className="bg-background">
+      <SectionReveal id="business" className="bg-background py-32">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
             <RevealItem>
@@ -104,7 +104,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* Project Status Section */}
-      <SectionReveal id="status" className="bg-white">
+      <SectionReveal id="status" className="bg-white py-32">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <RevealItem>
@@ -124,9 +124,9 @@ export default function Home() {
       </SectionReveal>
 
       {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-background">
+      <SectionReveal id="why" className="bg-background py-40">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
+          <div className="text-center max-w-3xl mx-auto mb-24 space-y-6">
             <RevealItem>
               <span className="text-accent font-bold text-xs tracking-widest uppercase">Why Choose Us</span>
             </RevealItem>
@@ -139,7 +139,7 @@ export default function Home() {
       </SectionReveal>
 
       {/* CTA Band */}
-      <SectionReveal id="contact" className="bg-primary text-white py-24">
+      <SectionReveal id="contact" className="bg-primary text-white py-32">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12">
           <div className="space-y-6">
             <RevealItem>

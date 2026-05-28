@@ -34,7 +34,7 @@ export default function InquiryPage() {
     e.preventDefault();
     
     // 필수 항목 유효성 검사
-    if (!formData.name || !formData.phone || !formData.serviceType || !formData.content) {
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.serviceType || !formData.content.trim()) {
       toast({
         variant: "destructive",
         title: "입력 오류",
@@ -47,29 +47,45 @@ export default function InquiryPage() {
     
     const inquiriesRef = collection(db, 'inquiries');
     const dataToSave = {
-      ...formData,
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      serviceType: formData.serviceType,
+      content: formData.content,
       createdAt: serverTimestamp()
     };
 
-    // Firestore 저장 (await 하지 않음 - 즉각적인 UI 반응을 위해)
+    // Firestore 저장 및 낙관적 UI 전환
     addDoc(inquiriesRef, dataToSave)
+      .then(() => {
+        // 성공 시 상태 업데이트
+        setSubmitted(true);
+        setLoading(false);
+        toast({
+          title: "상담 신청 완료",
+          description: "담당자가 확인 후 신속하게 연락드리겠습니다.",
+        });
+      })
       .catch(async (err) => {
+        setLoading(false);
         const permissionError = new FirestorePermissionError({
           path: inquiriesRef.path,
           operation: 'create',
           requestResourceData: dataToSave,
         });
         errorEmitter.emit('permission-error', permissionError);
+        
+        toast({
+          variant: "destructive",
+          title: "전송 오류",
+          description: "상담 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        });
       });
 
-    // 즉시 완료 상태로 전환 (낙관적 업데이트)
-    setSubmitted(true);
-    setLoading(false);
-    
-    toast({
-      title: "상담 신청 완료",
-      description: "담당자가 확인 후 신속하게 연락드리겠습니다.",
-    });
+    // 즉시 완료된 것처럼 보이게 하려면 아래 주석을 해제할 수 있지만, 
+    // 실제 저장 확인을 위해 .then() 블록에서 처리하는 것이 더 정확합니다.
+    // setSubmitted(true);
+    // setLoading(false);
   };
 
   if (submitted) {
@@ -211,7 +227,7 @@ export default function InquiryPage() {
                     {loading ? (
                       <>
                         <Loader2 className="mr-3 w-6 h-6 animate-spin" />
-                        처리 중입니다...
+                        전송 중...
                       </>
                     ) : (
                       <>

@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, Timestamp } from 'firebase/firestore';
 import { Trash2, LayoutDashboard, Mail, Phone, Clock, User, ArrowLeft, Lock, ImageIcon, Upload, X, Loader2, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -28,7 +28,6 @@ export default function AdminPage() {
   const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => (2025 + i).toString());
 
   const [newPortfolio, setNewPortfolio] = useState({
@@ -46,19 +45,36 @@ export default function AdminPage() {
     }
   }, []);
 
+  // 인덱스 오류를 피하기 위해 orderBy를 제거하고 메모리에서 정렬합니다.
   const inquiryQuery = useMemo(() => {
     if (!db) return null;
-    return query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
+    return collection(db, 'inquiries');
   }, [db]);
   
-  const { data: inquiries, loading: inquiriesLoading } = useCollection(inquiryQuery);
+  const { data: rawInquiries, loading: inquiriesLoading } = useCollection(inquiryQuery);
+  const inquiries = useMemo(() => {
+    if (!rawInquiries) return [];
+    return [...rawInquiries].sort((a: any, b: any) => {
+      const timeA = a.createdAt?.seconds || 0;
+      const timeB = b.createdAt?.seconds || 0;
+      return timeB - timeA;
+    });
+  }, [rawInquiries]);
 
   const portfolioQuery = useMemo(() => {
     if (!db) return null;
-    return query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
+    return collection(db, 'portfolios');
   }, [db]);
   
-  const { data: portfolios } = useCollection(portfolioQuery);
+  const { data: rawPortfolios } = useCollection(portfolioQuery);
+  const portfolios = useMemo(() => {
+    if (!rawPortfolios) return [];
+    return [...rawPortfolios].sort((a: any, b: any) => {
+      const timeA = a.createdAt?.seconds || 0;
+      const timeB = b.createdAt?.seconds || 0;
+      return timeB - timeA;
+    });
+  }, [rawPortfolios]);
 
   const handleManualLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +109,8 @@ export default function AdminPage() {
           let width = img.width;
           let height = img.height;
 
-          // 시공 사례용으로 충분한 1024px로 리사이징
-          const MAX_SIZE = 1024;
+          // 홈페이지 표시용으로 최적화된 800px로 리사이징 (Firestore 1MB 제한 대비)
+          const MAX_SIZE = 800;
           if (width > height) {
             if (width > MAX_SIZE) {
               height *= MAX_SIZE / width;
@@ -116,8 +132,8 @@ export default function AdminPage() {
             ctx.drawImage(img, 0, 0, width, height);
           }
           
-          // 압축률을 0.5~0.6으로 조정하여 용량 최적화 (Firestore 1MB 제한)
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          // 압축률을 0.5로 조정하여 용량 최적화 (Base64 증가분 고려)
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
           resolve(dataUrl);
         };
         img.onerror = () => reject(new Error('이미지 로드 실패'));
@@ -137,7 +153,7 @@ export default function AdminPage() {
       try {
         const optimizedImage = await resizeAndCompressImage(file);
         setNewPortfolio(prev => ({ ...prev, imageUrl: optimizedImage }));
-        toast({ title: "이미지 준비 완료", description: "사진이 최적화되었습니다." });
+        toast({ title: "이미지 준비 완료", description: "사진이 홈페이지에 최적화되었습니다." });
       } catch (error) {
         console.error("Image processing error:", error);
         toast({ variant: "destructive", title: "오류 발생", description: "이미지 처리 중 문제가 발생했습니다." });
@@ -168,11 +184,11 @@ export default function AdminPage() {
       };
       
       await addDoc(colRef, data);
-      toast({ title: "등록 완료", description: "시공 사례가 홈페이지에 반영되었습니다." });
+      toast({ title: "등록 완료", description: "시공 사례가 홈페이지에 즉시 반영되었습니다." });
       setNewPortfolio({ title: '', category: '', subText: '', year: '2025', imageUrl: '' });
     } catch (err) {
       console.error("Firestore Save Error:", err);
-      toast({ variant: "destructive", title: "저장 실패", description: "용량이 너무 크거나 오류가 발생했습니다." });
+      toast({ variant: "destructive", title: "저장 실패", description: "데이터베이스 연결 문제 또는 용량 오류입니다." });
     } finally {
       setIsSubmitting(false);
     }

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { RevealItem } from '../SectionReveal';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
 
 const categories = ['전체', '하자보수', '방수', '도장', '기타'];
@@ -20,12 +20,13 @@ export function PortfolioGrid() {
   const [catFilter, setCatFilter] = useState('전체');
   const [yearFilter, setYearFilter] = useState('전체');
 
+  // 인덱스 오류 방지를 위해 orderBy를 제거하고 메모리에서 정렬합니다.
   const portfolioQuery = useMemo(() => {
     if (!db) return null;
-    return query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
+    return collection(db, 'portfolios');
   }, [db]);
 
-  const { data: portfolios, loading } = useCollection(portfolioQuery);
+  const { data: rawPortfolios, loading } = useCollection(portfolioQuery);
 
   useEffect(() => {
     if (categoryParam && categories.includes(categoryParam)) {
@@ -36,13 +37,21 @@ export function PortfolioGrid() {
   }, [categoryParam]);
 
   const filteredWorks = useMemo(() => {
-    if (!portfolios) return [];
-    return portfolios.filter(w => {
+    if (!rawPortfolios) return [];
+    
+    // 메모리에서 최신순 정렬 후 필터링 적용
+    const sorted = [...rawPortfolios].sort((a: any, b: any) => {
+      const timeA = a.createdAt?.seconds || 0;
+      const timeB = b.createdAt?.seconds || 0;
+      return timeB - timeA;
+    });
+
+    return sorted.filter(w => {
       const matchCat = catFilter === '전체' || w.category === catFilter;
       const matchYear = yearFilter === '전체' || w.year === yearFilter;
       return matchCat && matchYear;
     });
-  }, [portfolios, catFilter, yearFilter]);
+  }, [rawPortfolios, catFilter, yearFilter]);
 
   if (loading) {
     return (
@@ -99,14 +108,17 @@ export function PortfolioGrid() {
           {filteredWorks.map((work, i) => (
             <RevealItem key={work.id} delay={i * 100} className="group">
               <div className="bg-white rounded-3xl overflow-hidden border shadow-sm group-hover:shadow-xl transition-all duration-500">
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={work.imageUrl}
-                    alt={work.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
+                <div className="relative h-64 overflow-hidden bg-muted/20">
+                  {work.imageUrl && (
+                    <Image
+                      src={work.imageUrl}
+                      alt={work.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      unoptimized // Base64 이미지의 경우 Next.js 최적화 없이 직접 표시하는 것이 빠를 수 있습니다.
+                    />
+                  )}
                   <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">
                     {work.category}
                   </div>

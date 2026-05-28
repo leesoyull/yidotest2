@@ -93,9 +93,9 @@ export default function Home() {
       </SectionReveal>
 
       {/* Business Area Section */}
-      <SectionReveal id="business" className="bg-background py-8 md:py-10">
+      <SectionReveal id="business" className="bg-background py-24 md:py-32">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-6 space-y-1">
+          <div className="text-center max-w-3xl mx-auto mb-10 space-y-1">
             <RevealItem>
               <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Business Areas</span>
             </RevealItem>
@@ -113,9 +113,9 @@ export default function Home() {
       </SectionReveal>
 
       {/* Project Status Section */}
-      <SectionReveal id="status" className="bg-white py-8 md:py-10">
+      <SectionReveal id="status" className="bg-white py-24 md:py-32">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-6 space-y-1">
+          <div className="text-center max-w-3xl mx-auto mb-10 space-y-1">
             <RevealItem>
               <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Performance</span>
             </RevealItem>
@@ -128,9 +128,9 @@ export default function Home() {
       </SectionReveal>
 
       {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-background py-8 md:py-10">
+      <SectionReveal id="why" className="bg-background py-24 md:py-32">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-6 space-y-2">
+          <div className="text-center max-w-3xl mx-auto mb-10 space-y-2">
             <RevealItem>
               <span className="text-accent font-bold text-[10px] tracking-widest uppercase">Why Choose Us</span>
             </RevealItem>

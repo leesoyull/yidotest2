@@ -3,7 +3,6 @@ import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Home/Hero';
 import { SectionReveal, RevealItem } from '@/components/SectionReveal';
 import { BusinessGrid } from '@/components/Home/BusinessGrid';
-import { PortfolioGrid } from '@/components/Home/PortfolioGrid';
 import { StatsBand } from '@/components/Home/StatsBand';
 import { Footer } from '@/components/Home/Footer';
 import { Button } from '@/components/ui/button';
@@ -100,23 +99,8 @@ export default function Home() {
         </div>
       </SectionReveal>
 
-      {/* Portfolio Section */}
-      <SectionReveal id="portfolio" className="bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-            <RevealItem>
-              <span className="text-accent font-bold text-xs tracking-widest uppercase">Our Works</span>
-            </RevealItem>
-            <RevealItem delay={100}>
-              <h2 className="font-headline text-4xl md:text-5xl font-bold">성실하게 완수된 시공 사례</h2>
-            </RevealItem>
-          </div>
-          <PortfolioGrid />
-        </div>
-      </SectionReveal>
-
       {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-background">
+      <SectionReveal id="why" className="bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
             <RevealItem>
@@ -130,7 +114,7 @@ export default function Home() {
         </div>
       </SectionReveal>
 
-      {/* CTA Band - Moved to the bottom per request */}
+      {/* CTA Band */}
       <SectionReveal id="contact" className="bg-primary text-white py-16">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="space-y-4">

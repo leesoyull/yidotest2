@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Mail, MapPin } from 'lucide-react';
+import { Send, Mail, MapPin, Loader2 } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { sendInquiryNotification } from '@/app/actions/inquiry-actions';
 
 export default function InquiryPage() {
   const { toast } = useToast();
@@ -29,7 +30,7 @@ export default function InquiryPage() {
     content: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.serviceType || !formData.content) {
       toast({
@@ -41,41 +42,54 @@ export default function InquiryPage() {
     }
 
     setLoading(true);
-    const inquiriesRef = collection(db, 'inquiries');
-    const data = {
-      ...formData,
-      createdAt: serverTimestamp()
-    };
+    
+    try {
+      // 1. Firestore에 저장 (관리자 대시보드 확인용)
+      const inquiriesRef = collection(db, 'inquiries');
+      const data = {
+        ...formData,
+        createdAt: serverTimestamp()
+      };
+      await addDoc(inquiriesRef, data);
 
-    addDoc(inquiriesRef, data)
-      .then(() => {
+      // 2. 관리자에게 이메일 발송 (Server Action 호출)
+      const emailResult = await sendInquiryNotification(formData);
+
+      if (emailResult.success) {
+        toast({
+          title: "문의 접수 및 메일 발송 완료",
+          description: "담당자(yido610@naver.com)에게 알림이 전송되었습니다. 곧 연락드리겠습니다.",
+        });
+      } else {
+        // 메일 발송 실패 시에도 Firestore에는 저장되었으므로 완료 안내는 하되, 알림 실패는 로그로만 남김
         toast({
           title: "문의 접수 완료",
-          description: "정성껏 검토 후 신속하게 연락드리겠습니다.",
+          description: "시스템 알림 지연이 있을 수 있으나 정상 접수되었습니다.",
         });
-        setFormData({
-          name: '',
-          phone: '',
-          email: '',
-          serviceType: '',
-          content: ''
-        });
-        setLoading(false);
-      })
-      .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: inquiriesRef.path,
-          operation: 'create',
-          requestResourceData: data,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-        toast({
-          variant: "destructive",
-          title: "접수 실패",
-          description: "잠시 후 다시 시도해주세요.",
-        });
-        setLoading(false);
+      }
+
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        serviceType: '',
+        content: ''
       });
+    } catch (err: any) {
+      console.error(err);
+      const permissionError = new FirestorePermissionError({
+        path: 'inquiries',
+        operation: 'create',
+      });
+      errorEmitter.emit('permission-error', permissionError);
+      toast({
+        variant: "destructive",
+        title: "접수 실패",
+        description: "잠시 후 다시 시도해주세요.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -194,8 +208,17 @@ export default function InquiryPage() {
                     className="w-full h-12 bg-accent hover:bg-accent/90 text-base font-bold rounded-xl shadow-lg shadow-accent/20"
                     disabled={loading}
                   >
-                    {loading ? "전송 중..." : "문의 신청하기"}
-                    {!loading && <Send className="ml-2 w-4 h-4" />}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                        전송 중...
+                      </>
+                    ) : (
+                      <>
+                        문의 신청하기
+                        <Send className="ml-2 w-4 h-4" />
+                      </>
+                    )}
                   </Button>
                 </form>
               </CardContent>

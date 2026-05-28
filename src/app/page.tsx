@@ -37,14 +37,14 @@ export default function Home() {
             <div className="space-y-8">
               <RevealItem>
                 <span className="text-accent font-bold text-xs tracking-widest uppercase">Company Intro</span>
-                <h2 className="font-headline text-5xl md:text-7xl font-black mt-4 leading-tight text-primary">
+                <h2 className="font-headline text-4xl md:text-6xl font-black mt-4 leading-tight text-primary">
                   이도 (利道)
                 </h2>
               </RevealItem>
               <RevealItem delay={100}>
                 <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
                   <p className="font-bold text-primary text-xl">
-                    이로운 길을 함께 걷겠습니다
+                    이롭고 바른 길을 함께 걷겠습니다
                   </p>
                   <p className="font-light">
                     이도건설의 사명 '이도(利道)'는 '이로울 이(利)'와 '길 도(道)'로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 뜻을 담고 있습니다. 작은 공사 하나도 정직하고 성실하게 완수하는 것을 최우선 가치로 삼습니다.

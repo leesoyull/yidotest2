@@ -79,7 +79,7 @@ export default function AdminPage() {
 
   const processFile = (file: File) => {
     if (file) {
-      if (file.size > 800 * 1024) { // 800KB 제한 (Firestore 1MB 제한 및 Base64 인코딩 고려)
+      if (file.size > 800 * 1024) { 
         toast({ variant: "destructive", title: "용량 초과", description: "800KB 이하의 이미지만 업로드 가능합니다." });
         return;
       }

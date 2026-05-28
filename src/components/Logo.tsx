@@ -19,7 +19,7 @@ export function Logo({ className, variant = 'dark' }: LogoProps) {
       {/* 로고 아이콘: 사용자 이미지의 비율과 디테일을 SVG로 정밀 재현 */}
       <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0 transition-transform group-hover:scale-105">
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          {/* 메인 외곽 집 모양 (Pentagon) */}
+          {/* 메인 외곽 집 모양 (Pentagon) - 내부가 비어있는 형태를 재현하기 위해 EvenOdd 규칙 사용 */}
           <path 
             fillRule="evenodd" 
             clipRule="evenodd" 

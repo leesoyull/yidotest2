@@ -3,9 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, ChevronDown, Building2 } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/Logo';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,16 +42,8 @@ export function Navbar() {
       scrolled ? "bg-white/90 backdrop-blur-md shadow-md py-3" : "bg-transparent py-5"
     )}>
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-primary p-1.5 rounded-lg text-white">
-            <Building2 className="w-6 h-6" />
-          </div>
-          <span className={cn(
-            "font-headline font-bold text-2xl tracking-tight transition-colors",
-            scrolled ? "text-primary" : "text-white"
-          )}>
-            이도건설
-          </span>
+        <Link href="/">
+          <Logo variant={scrolled ? 'dark' : 'light'} />
         </Link>
 
         {/* Desktop Menu */}

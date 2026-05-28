@@ -2,21 +2,19 @@
 "use client"
 
 import Link from 'next/link';
-import { Mail, MapPin, Building2 } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export function Footer() {
   return (
     <footer className="bg-[#0d1f35] text-white/80 pt-8">
       <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-8 pb-6 border-b border-white/5">
+        <div className="grid md:grid-cols-2 gap-8 pb-6 border-b border-white/5 items-center">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-white">
-              <div className="bg-primary p-1.5 rounded-lg">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <span className="font-headline font-bold text-2xl tracking-tight">이도건설</span>
-            </div>
-            <div className="text-sm font-medium text-white/60 uppercase tracking-wider">
+            <Link href="/">
+              <Logo variant="light" />
+            </Link>
+            <div className="text-sm font-medium text-white/40 uppercase tracking-widest pl-1">
               CEO : LEE SOYUL
             </div>
           </div>

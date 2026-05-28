@@ -115,7 +115,22 @@ export default function Home() {
         </div>
       </SectionReveal>
 
-      {/* CTA Band */}
+      {/* Why Yido Section */}
+      <SectionReveal id="why" className="bg-background">
+        <div className="container mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
+            <RevealItem>
+              <span className="text-accent font-bold text-xs tracking-widest uppercase">Why Choose Us</span>
+            </RevealItem>
+            <RevealItem delay={100}>
+              <h2 className="font-headline text-4xl md:text-5xl font-bold">이도건설을 선택해야 하는 이유</h2>
+            </RevealItem>
+          </div>
+          <StatsBand />
+        </div>
+      </SectionReveal>
+
+      {/* CTA Band - Moved to the bottom per request */}
       <SectionReveal id="contact" className="bg-primary text-white py-16">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="space-y-4">
@@ -137,21 +152,6 @@ export default function Home() {
               </Button>
             </RevealItem>
           </div>
-        </div>
-      </SectionReveal>
-
-      {/* Why Yido Section */}
-      <SectionReveal id="why" className="bg-background">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-            <RevealItem>
-              <span className="text-accent font-bold text-xs tracking-widest uppercase">Why Choose Us</span>
-            </RevealItem>
-            <RevealItem delay={100}>
-              <h2 className="font-headline text-4xl md:text-5xl font-bold">이도건설을 선택해야 하는 이유</h2>
-            </RevealItem>
-          </div>
-          <StatsBand />
         </div>
       </SectionReveal>
 

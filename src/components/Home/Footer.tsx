@@ -16,9 +16,6 @@ export function Footer() {
               </div>
               <span className="font-headline font-bold text-2xl tracking-tight">이도건설</span>
             </div>
-            <p className="text-sm leading-relaxed text-white/70">
-              건물의 안전과 가치를 지키는 이도건설입니다.
-            </p>
             <div className="text-sm font-medium text-white/60">
               대표이사: 이소율
             </div>

@@ -11,17 +11,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Mail, MapPin, Loader2 } from 'lucide-react';
+import { Send, Mail, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
-import { sendInquiryNotification } from '@/app/actions/inquiry-actions';
 
 export default function InquiryPage() {
   const { toast } = useToast();
   const db = useFirestore();
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -44,53 +42,53 @@ export default function InquiryPage() {
     setLoading(true);
     
     try {
-      // 1. Firestore에 저장 (관리자 대시보드 확인용)
+      // 1. Firestore에 저장 (관리자 대시보드에서 즉시 확인 가능)
       const inquiriesRef = collection(db, 'inquiries');
-      const data = {
+      await addDoc(inquiriesRef, {
         ...formData,
         createdAt: serverTimestamp()
-      };
-      await addDoc(inquiriesRef, data);
+      });
 
-      // 2. 관리자에게 이메일 발송 (Server Action 호출)
-      const emailResult = await sendInquiryNotification(formData);
-
-      if (emailResult.success) {
-        toast({
-          title: "문의 접수 및 메일 발송 완료",
-          description: "담당자(yido610@naver.com)에게 알림이 전송되었습니다. 곧 연락드리겠습니다.",
-        });
-      } else {
-        // 메일 발송 실패 시에도 Firestore에는 저장되었으므로 완료 안내는 하되, 알림 실패는 로그로만 남김
-        toast({
-          title: "문의 접수 완료",
-          description: "시스템 알림 지연이 있을 수 있으나 정상 접수되었습니다.",
-        });
-      }
-
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        serviceType: '',
-        content: ''
+      setSubmitted(true);
+      toast({
+        title: "접수 완료",
+        description: "문의 내용이 성공적으로 전달되었습니다. 곧 연락드리겠습니다.",
       });
     } catch (err: any) {
       console.error(err);
-      const permissionError = new FirestorePermissionError({
-        path: 'inquiries',
-        operation: 'create',
-      });
-      errorEmitter.emit('permission-error', permissionError);
       toast({
         variant: "destructive",
         title: "접수 실패",
-        description: "잠시 후 다시 시도해주세요.",
+        description: "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
       });
     } finally {
       setLoading(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <main className="min-h-screen bg-muted/30">
+        <Navbar />
+        <div className="pt-40 pb-32 container mx-auto px-6 text-center">
+          <div className="max-w-md mx-auto bg-white p-10 rounded-3xl shadow-xl space-y-6">
+            <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-green-600">
+              <CheckCircle2 className="w-10 h-10" />
+            </div>
+            <h2 className="text-3xl font-black text-primary">접수되었습니다!</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              보내주신 소중한 문의 내용이 관리자에게 전달되었습니다.<br/>
+              확인 후 신속하게 연락드리겠습니다.
+            </p>
+            <Button asChild className="w-full h-14 text-lg font-bold rounded-xl" variant="default">
+              <a href="/">홈으로 돌아가기</a>
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-muted/30">
@@ -102,7 +100,8 @@ export default function InquiryPage() {
             <div>
               <h1 className="font-headline text-3xl font-bold text-primary mb-3">문의하기</h1>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                건물의 안전과 가치를 지키는 이도건설입니다.
+                건물의 안전과 가치를 지키는 이도건설입니다. <br/>
+                온라인 문의 시 담당자가 내용을 확인하여 24시간 이내에 연락드립니다.
               </p>
             </div>
 
@@ -133,7 +132,7 @@ export default function InquiryPage() {
             <Card className="border-none shadow-xl rounded-2xl">
               <CardHeader className="bg-primary text-white rounded-t-2xl py-6">
                 <CardTitle className="text-xl">견적 및 상담 신청</CardTitle>
-                <CardDescription className="text-white/70 text-xs">정확한 정보를 입력해주시면 신속한 대응이 가능합니다.</CardDescription>
+                <CardDescription className="text-white/70 text-xs">정확한 정보를 입력해주시면 더욱 빠른 상담이 가능합니다.</CardDescription>
               </CardHeader>
               <CardContent className="p-6 md:p-8">
                 <form onSubmit={handleSubmit} className="space-y-5">

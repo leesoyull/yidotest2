@@ -1,7 +1,8 @@
+
 "use client"
 
 import Link from 'next/link';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, Settings } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 
 export function Footer() {
@@ -36,6 +37,9 @@ export function Footer() {
           <div className="text-[9px] text-white/30 uppercase tracking-widest">
             &copy; {new Date().getFullYear()} YIDO CONSTRUCTION. ALL RIGHTS RESERVED.
           </div>
+          <Link href="/admin" className="text-[9px] text-white/20 hover:text-white/50 flex items-center gap-1 transition-colors">
+            <Settings className="w-2.5 h-2.5" /> ADMIN LOGIN
+          </Link>
         </div>
       </div>
     </footer>

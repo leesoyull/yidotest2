@@ -12,11 +12,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Building2, Send, Phone, Mail, MapPin } from 'lucide-react';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function InquiryPage() {
   const { toast } = useToast();
+  const db = useFirestore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -26,7 +29,7 @@ export default function InquiryPage() {
     content: ''
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.serviceType || !formData.content) {
       toast({
@@ -38,35 +41,41 @@ export default function InquiryPage() {
     }
 
     setLoading(true);
-    try {
-      const { firestore } = initializeFirebase();
-      await addDoc(collection(firestore, 'inquiries'), {
-        ...formData,
-        createdAt: serverTimestamp()
-      });
+    const inquiriesRef = collection(db, 'inquiries');
+    const data = {
+      ...formData,
+      createdAt: serverTimestamp()
+    };
 
-      toast({
-        title: "문의 접수 완료",
-        description: "정성껏 검토 후 신속하게 연락드리겠습니다.",
+    addDoc(inquiriesRef, data)
+      .then(() => {
+        toast({
+          title: "문의 접수 완료",
+          description: "정성껏 검토 후 신속하게 연락드리겠습니다.",
+        });
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          serviceType: '',
+          content: ''
+        });
+        setLoading(false);
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: inquiriesRef.path,
+          operation: 'create',
+          requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({
+          variant: "destructive",
+          title: "접수 실패",
+          description: "잠시 후 다시 시도해주세요.",
+        });
+        setLoading(false);
       });
-
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        serviceType: '',
-        content: ''
-      });
-    } catch (error) {
-      console.error("Error submitting inquiry:", error);
-      toast({
-        variant: "destructive",
-        title: "접수 실패",
-        description: "잠시 후 다시 시도해주세요.",
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -79,8 +88,7 @@ export default function InquiryPage() {
             <div>
               <h1 className="font-headline text-4xl font-bold text-primary mb-4">문의하기</h1>
               <p className="text-muted-foreground leading-relaxed">
-                건물의 안전과 가치를 지키는 이도건설입니다.<br />
-                궁금하신 점이나 견적 문의를 남겨주시면 전문가가 상세히 답변해 드립니다.
+                건물의 안전과 가치를 지키는 이도건설입니다.
               </p>
             </div>
 

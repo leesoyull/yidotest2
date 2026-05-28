@@ -36,15 +36,12 @@ export default function Home() {
               <RevealItem>
                 <span className="text-accent font-bold text-xs tracking-widest uppercase">Company Intro</span>
                 <h2 className="font-headline text-4xl md:text-5xl font-bold mt-4 leading-tight">
-                  <span className="text-primary">이롭고 바른 길</span>을 <br/>
+                  <span className="text-primary">이로운 길</span>을 <br/>
                   함께 걷겠습니다
                 </h2>
               </RevealItem>
               <RevealItem delay={100}>
                 <div className="space-y-6 text-muted-foreground text-lg font-light leading-relaxed">
-                  <p>
-                    이도건설의 사명 <strong>'이도(以道)'</strong>는 '이로울 이(以)'와 '길 도(道)'로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 뜻을 담고 있습니다. 작은 공사 하나도 정직하고 성실하게 완수하는 것을 최우선 가치로 삼습니다.
-                  </p>
                   <p>
                     건물의 안전과 가치를 지키는 이도건설입니다.
                   </p>
@@ -118,7 +115,7 @@ export default function Home() {
           <div className="space-y-4">
             <RevealItem>
               <h3 className="font-headline text-3xl md:text-4xl font-bold">견적을 의뢰하고 싶으신가요?</h3>
-              <p className="text-white/70 text-lg font-light">현장 확인 후 합리적인 견적을 빠르게 안내해 드립니다.</p>
+              <p className="text-white/70 text-lg font-light">건물의 안전과 가치를 지키는 이도건설입니다.</p>
             </RevealItem>
           </div>
           <div className="flex flex-col items-center md:items-end gap-6">

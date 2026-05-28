@@ -56,11 +56,6 @@ export function Footer() {
                 <span>경기도 (현장 방문 상담 지원)</span>
               </li>
             </ul>
-            <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-               <p className="text-[11px] leading-relaxed text-white/40">
-                 건물의 안전과 가치를 지키는 이도건설입니다.
-               </p>
-            </div>
           </div>
         </div>
 

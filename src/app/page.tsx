@@ -31,22 +31,22 @@ export default function Home() {
       </div>
 
       {/* About Section */}
-      <SectionReveal id="about" className="bg-white">
+      <SectionReveal id="about" className="bg-white py-32">
         <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-8">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            <div className="space-y-10">
               <RevealItem>
-                <span className="text-accent font-bold text-xs tracking-widest uppercase">Company Intro</span>
-                <h2 className="font-brush text-5xl md:text-7xl mt-4 leading-tight text-primary font-black">
-                  이도 (利道)
+                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-4 block">Company Intro</span>
+                <h2 className="font-brush text-7xl md:text-8xl text-primary leading-tight">
+                  이도 <span className="text-3xl md:text-4xl font-normal ml-2 opacity-80">(利道)</span>
                 </h2>
               </RevealItem>
               <RevealItem delay={100}>
-                <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
-                  <p className="font-bold text-primary text-xl">
+                <div className="space-y-8 text-muted-foreground text-lg leading-relaxed">
+                  <p className="font-bold text-primary text-2xl">
                     이롭고 바른 길을 함께 걷겠습니다
                   </p>
-                  <div className="font-light space-y-4 text-base">
+                  <div className="space-y-6 text-base font-normal">
                     <p>
                       이도건설의 사명 '이도(利道)'는 '이로울 이(利)'와 '길 도(道)'로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 뜻을 담고 있습니다. 작은 공사 하나도 정직하고 성실하게 완수하는 것을 최우선 가치로 삼습니다.
                     </p>
@@ -56,8 +56,8 @@ export default function Home() {
                   </div>
                 </div>
               </RevealItem>
-              <RevealItem delay={200}>
-                <Button asChild size="lg" className="h-14 px-8 rounded-full bg-primary hover:bg-primary/90">
+              <RevealItem delay={200} className="pt-6">
+                <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
                   <Link href="/inquiry" className="flex items-center gap-2">
                     상담 문의하기 <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -65,15 +65,15 @@ export default function Home() {
               </RevealItem>
             </div>
             
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 gap-8">
               {[
                 { title: '정직한 시공', desc: '과장 없이 정확한 견적과 성실한 시공을 약속합니다.' },
                 { title: '꼼꼼한 진단', desc: '근본 원인을 찾아 재발 없는 보수를 진행합니다.' },
                 { title: '책임 시공 보증', desc: '시공 후에도 철저한 사후관리를 보장합니다.' },
                 { title: '신속한 대응', desc: '신속하게 현장을 확인하고 방안을 제안합니다.' },
               ].map((card, i) => (
-                <RevealItem key={i} delay={i * 100} className="p-8 bg-muted/30 rounded-2xl border border-muted hover:border-accent/50 transition-colors">
-                  <h4 className="font-bold text-primary text-xl mb-3">{card.title}</h4>
+                <RevealItem key={i} delay={i * 150} className="p-10 bg-muted/30 rounded-3xl border border-muted hover:border-accent/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+                  <h4 className="font-bold text-primary text-xl mb-4">{card.title}</h4>
                   <p className="text-muted-foreground text-sm leading-relaxed">{card.desc}</p>
                 </RevealItem>
               ))}
@@ -139,23 +139,23 @@ export default function Home() {
       </SectionReveal>
 
       {/* CTA Band */}
-      <SectionReveal id="contact" className="bg-primary text-white py-16">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="space-y-4">
+      <SectionReveal id="contact" className="bg-primary text-white py-24">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="space-y-6">
             <RevealItem>
-              <h3 className="font-headline text-3xl md:text-4xl font-bold">견적을 의뢰하고 싶으신가요?</h3>
-              <p className="text-white/70 text-lg font-light">건물의 안전과 가치를 지키는 이도건설입니다.</p>
+              <h3 className="font-headline text-3xl md:text-5xl font-bold leading-tight">견적을 의뢰하고 싶으신가요?</h3>
+              <p className="text-white/70 text-xl font-light">건물의 안전과 가치를 지키는 이도건설이 함께합니다.</p>
             </RevealItem>
           </div>
-          <div className="flex flex-col items-center md:items-end gap-6">
+          <div className="flex flex-col items-center md:items-end gap-8">
             <RevealItem delay={100}>
-              <div className="flex items-center gap-4 py-2 px-6 bg-white/5 rounded-full border border-white/10">
-                <Mail className="text-accent w-5 h-5" />
-                <span className="font-bold text-accent">yido610@naver.com</span>
+              <div className="flex items-center gap-4 py-3 px-8 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                <Mail className="text-accent w-6 h-6" />
+                <span className="font-bold text-accent text-lg">yido610@naver.com</span>
               </div>
             </RevealItem>
             <RevealItem delay={200}>
-              <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-16 px-10 rounded-full text-lg font-black transition-all">
+              <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-16 px-12 rounded-full text-xl font-black transition-all shadow-2xl">
                 <Link href="/inquiry">지금 바로 문의하기</Link>
               </Button>
             </RevealItem>

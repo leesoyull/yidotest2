@@ -6,6 +6,7 @@ import { collection } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
 import { RevealItem } from '../SectionReveal';
 import { Trophy, Calendar, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export function ProjectStatus() {
   const db = useFirestore();
@@ -24,11 +25,11 @@ export function ProjectStatus() {
 
   return (
     <div className="grid md:grid-cols-3 gap-8">
-      {stats.map((stat, i) => (
-        <RevealItem key={i} delay={i * 100} className="relative group">
-          <div className={`p-8 rounded-2xl border-2 transition-all duration-500 ${
+      {stats.map((stat, i) => {
+        const content = (
+          <div className={`p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left ${
             stat.highlight 
-            ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-105 z-10' 
+            ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-105 z-10 hover:bg-primary/90 cursor-pointer' 
             : 'bg-white border-muted hover:border-accent text-primary'
           }`}>
             <div className={`mb-6 flex items-center justify-between`}>
@@ -44,13 +45,26 @@ export function ProjectStatus() {
               <h4 className="text-4xl font-black">{stat.value}</h4>
             </div>
             {stat.highlight && (
-              <div className="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-medium">
-                * 기존 실적 및 신규 등록 건 합산 기준
+              <div className="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-medium flex justify-between items-center">
+                <span>* 기존 실적 및 신규 등록 건 합산 기준</span>
+                <span className="text-accent font-bold flex items-center gap-1">전체보기 →</span>
               </div>
             )}
           </div>
-        </RevealItem>
-      ))}
+        );
+
+        return (
+          <RevealItem key={i} delay={i * 100} className="relative group">
+            {stat.highlight ? (
+              <Link href="/portfolio">
+                {content}
+              </Link>
+            ) : (
+              content
+            )}
+          </RevealItem>
+        );
+      })}
     </div>
   );
 }

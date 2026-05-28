@@ -18,6 +18,7 @@ export function PortfolioGrid() {
   const [filter, setFilter] = useState('전체');
 
   const portfolioQuery = useMemo(() => {
+    if (!db) return null;
     return query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
   }, [db]);
 
@@ -38,16 +39,27 @@ export function PortfolioGrid() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
+      <div className="flex flex-col items-center justify-center py-32 gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground font-bold text-sm">시공 사례를 불러오는 중입니다...</p>
       </div>
     );
   }
 
   if (!portfolios || portfolios.length === 0) {
     return (
-      <div className="text-center py-20 text-muted-foreground">
-        등록된 시공 사례가 없습니다.
+      <div className="text-center py-32 bg-muted/20 rounded-[3rem] border-2 border-dashed border-muted">
+        <div className="mb-4">
+          <Image
+            src="https://picsum.photos/seed/empty/200/200"
+            alt="No items"
+            width={100}
+            height={100}
+            className="mx-auto opacity-20 grayscale"
+          />
+        </div>
+        <h3 className="text-xl font-bold text-primary">등록된 시공 사례가 없습니다.</h3>
+        <p className="text-sm text-muted-foreground mt-2">관리자 페이지에서 첫 사례를 등록해 보세요.</p>
       </div>
     );
   }
@@ -73,7 +85,7 @@ export function PortfolioGrid() {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredWorks.map((work, i) => (
-          <RevealItem key={work.id} delay={i * 100} className="group cursor-pointer">
+          <RevealItem key={work.id} delay={i * 100} className="group">
             <div className="bg-white rounded-2xl overflow-hidden border shadow-sm group-hover:shadow-xl transition-all duration-500">
               <div className="relative h-64 overflow-hidden">
                 <Image
@@ -81,6 +93,7 @@ export function PortfolioGrid() {
                   alt={work.title}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                   {work.category}
@@ -88,7 +101,7 @@ export function PortfolioGrid() {
               </div>
               <div className="p-6">
                 <div className="text-xs text-accent font-bold mb-2 uppercase tracking-tight">{work.subText}</div>
-                <h4 className="text-lg font-bold text-primary group-hover:text-accent transition-colors mb-4">{work.title}</h4>
+                <h4 className="text-lg font-bold text-primary group-hover:text-accent transition-colors mb-4 line-clamp-1">{work.title}</h4>
                 <div className="flex justify-between items-center pt-4 border-t border-muted">
                    <span className="text-[10px] text-muted-foreground font-medium">시공 완료</span>
                    <span className="text-primary group-hover:translate-x-1 transition-transform">→</span>

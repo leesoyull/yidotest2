@@ -78,7 +78,7 @@ export default function AdminPage() {
     toast({ title: "로그아웃 완료" });
   };
 
-  // 이미지 리사이징 및 압축 함수 (Firestore 1MB 제한 준수용)
+  // 고화질 이미지를 Firestore 1MB 제한에 맞춰 최적화 (Base64 변환 고려하여 약 500-600KB 타겟)
   const resizeAndCompressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -91,8 +91,8 @@ export default function AdminPage() {
           let width = img.width;
           let height = img.height;
 
-          // 최대 해상도 제한 (가로/세로 중 긴 쪽을 1200px로 조절)
-          const MAX_SIZE = 1200;
+          // 긴 쪽을 1024px로 제한 (웹 용도로 충분)
+          const MAX_SIZE = 1024;
           if (width > height) {
             if (width > MAX_SIZE) {
               height *= MAX_SIZE / width;
@@ -108,22 +108,26 @@ export default function AdminPage() {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, width, height);
+          }
           
-          // JPEG 형식으로 압축 (화질 0.7)
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          // 압축률을 0.6으로 조정하여 용량 안정성 확보
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
           resolve(dataUrl);
         };
-        img.onerror = reject;
+        img.onerror = () => reject(new Error('이미지 로드 실패'));
       };
-      reader.onerror = reject;
+      reader.onerror = () => reject(new Error('파일 읽기 실패'));
     });
   };
 
   const processFile = async (file: File) => {
     if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB 이상은 너무 큼
-        toast({ variant: "destructive", title: "용량 초과", description: "10MB 이하의 이미지만 업로드 가능합니다." });
+      if (!file.type.startsWith('image/')) {
+        toast({ variant: "destructive", title: "형식 오류", description: "이미지 파일만 업로드 가능합니다." });
         return;
       }
 
@@ -131,6 +135,7 @@ export default function AdminPage() {
       try {
         const optimizedImage = await resizeAndCompressImage(file);
         setNewPortfolio({ ...newPortfolio, imageUrl: optimizedImage });
+        toast({ title: "이미지 준비 완료", description: "고화질 사진이 최적화되었습니다." });
       } catch (error) {
         console.error("Image processing error:", error);
         toast({ variant: "destructive", title: "오류 발생", description: "이미지 처리 중 문제가 발생했습니다." });
@@ -161,46 +166,50 @@ export default function AdminPage() {
     if (file) processFile(file);
   };
 
-  const handleAddPortfolio = (e: React.FormEvent) => {
+  const handleAddPortfolio = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPortfolio.title || !newPortfolio.category || !newPortfolio.imageUrl) {
-      toast({ variant: "destructive", title: "입력 부족", description: "필수 항목(제목, 카테고리, 이미지)을 입력해 주세요." });
+      toast({ variant: "destructive", title: "입력 부족", description: "제목, 카테고리, 이미지는 필수입니다." });
       return;
     }
-    setIsSubmitting(true);
-    const colRef = collection(db, 'portfolios');
-    const data = { ...newPortfolio, createdAt: serverTimestamp() };
     
-    addDoc(colRef, data)
-      .then(() => {
-        toast({ title: "시공사례 등록 완료", description: "홈페이지에 즉시 반영되었습니다." });
-        setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
-      })
-      .catch(async (err) => {
-        console.error("Firestore Save Error:", err);
-        errorEmitter.emit('permission-error', new FirestorePermissionError({
-          path: colRef.path,
-          operation: 'create',
-          requestResourceData: data
-        }));
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+    setIsSubmitting(true);
+    try {
+      const colRef = collection(db, 'portfolios');
+      const data = { 
+        ...newPortfolio, 
+        createdAt: serverTimestamp() 
+      };
+      
+      await addDoc(colRef, data);
+      toast({ title: "등록 완료", description: "시공 사례가 홈페이지에 즉시 반영되었습니다." });
+      setNewPortfolio({ title: '', category: '', subText: '', imageUrl: '' });
+    } catch (err) {
+      console.error("Firestore Save Error:", err);
+      toast({ variant: "destructive", title: "저장 실패", description: "데이터베이스 저장 중 오류가 발생했습니다." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDeleteInquiry = (id: string) => {
-    if (!confirm('해당 문의 내역을 삭제하시겠습니까? (삭제 시 복구가 불가능합니다)')) return;
-    const docRef = doc(db, 'inquiries', id);
-    deleteDoc(docRef).catch(() => {});
-    toast({ title: "삭제 완료" });
+  const handleDeleteInquiry = async (id: string) => {
+    if (!confirm('해당 문의 내역을 삭제하시겠습니까?')) return;
+    try {
+      await deleteDoc(doc(db, 'inquiries', id));
+      toast({ title: "삭제 완료" });
+    } catch (error) {
+      toast({ variant: "destructive", title: "삭제 실패" });
+    }
   };
 
-  const handleDeletePortfolio = (id: string) => {
+  const handleDeletePortfolio = async (id: string) => {
     if (!confirm('해당 시공사례를 삭제하시겠습니까?')) return;
-    const docRef = doc(db, 'portfolios', id);
-    deleteDoc(docRef).catch(() => {});
-    toast({ title: "삭제 완료" });
+    try {
+      await deleteDoc(doc(db, 'portfolios', id));
+      toast({ title: "삭제 완료" });
+    } catch (error) {
+      toast({ variant: "destructive", title: "삭제 실패" });
+    }
   };
 
   const formatTimestamp = (ts: any) => {
@@ -380,9 +389,9 @@ export default function AdminPage() {
                           <>
                             <Upload className={`w-8 h-8 transition-all ${isDragging ? 'text-accent scale-110' : 'text-muted-foreground group-hover:text-accent group-hover:scale-110'}`} />
                             <p className={`text-sm font-bold transition-all ${isDragging ? 'text-accent' : 'text-muted-foreground group-hover:text-accent'}`}>
-                              {isDragging ? "여기에 놓으세요!" : "사진을 끌어오거나 클릭하세요 (최대 10MB)"}
+                              {isDragging ? "여기에 놓으세요!" : "사진을 끌어오거나 클릭하세요"}
                             </p>
-                            <p className="text-[10px] text-muted-foreground/50">1MB~5MB 사진도 자동으로 리사이징하여 저장됩니다.</p>
+                            <p className="text-[10px] text-muted-foreground/50">고화질 사진(1~5MB)도 자동으로 압축되어 저장됩니다.</p>
                           </>
                         )}
                       </div>

@@ -1,0 +1,59 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "Modern architecture blueprint and building structure",
+      "imageUrl": "https://picsum.photos/seed/yido1/1920/1080",
+      "imageHint": "modern architecture"
+    },
+    {
+      "id": "hero-2",
+      "description": "Professional waterproofing work on a building rooftop",
+      "imageUrl": "https://picsum.photos/seed/yido2/1920/1080",
+      "imageHint": "rooftop construction"
+    },
+    {
+      "id": "hero-3",
+      "description": "Clean facility management team checking building systems",
+      "imageUrl": "https://picsum.photos/seed/yido3/1920/1080",
+      "imageHint": "building maintenance"
+    },
+    {
+      "id": "port-crack-repair",
+      "description": "Apartment wall crack repair work in progress",
+      "imageUrl": "https://picsum.photos/seed/yido4/600/400",
+      "imageHint": "wall repair"
+    },
+    {
+      "id": "port-waterproofing",
+      "description": "Rooftop urethane waterproofing finished result",
+      "imageUrl": "https://picsum.photos/seed/yido5/600/400",
+      "imageHint": "blue rooftop"
+    },
+    {
+      "id": "port-painting",
+      "description": "Freshly painted villa exterior in light grey",
+      "imageUrl": "https://picsum.photos/seed/yido6/600/400",
+      "imageHint": "villa exterior"
+    },
+    {
+      "id": "port-parking-leak",
+      "description": "Underground parking lot leak prevention construction",
+      "imageUrl": "https://picsum.photos/seed/yido7/600/400",
+      "imageHint": "parking garage"
+    },
+    {
+      "id": "port-bathroom",
+      "description": "High-quality bathroom tiling and waterproofing",
+      "imageUrl": "https://picsum.photos/seed/yido8/600/400",
+      "imageHint": "modern bathroom"
+    },
+    {
+      "id": "port-tile-repair",
+      "description": "Exterior tile replacement for a commercial building",
+      "imageUrl": "https://picsum.photos/seed/yido9/600/400",
+      "imageHint": "brick wall"
+    }
+  ]
+}

@@ -95,6 +95,7 @@ export default function AdminPage() {
     toast({ title: "로그아웃 완료" });
   };
 
+  // 이미지 최적화 및 압축 (가로 600px로 대폭 축소하여 전송 안정성 확보)
   const resizeAndCompressImage = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -130,7 +131,7 @@ export default function AdminPage() {
             ctx.drawImage(img, 0, 0, width, height);
           }
           
-          // 압축률을 0.4로 더 강화하여 데이터 용량 확보
+          // 압축률을 0.4로 더 강화하여 데이터 용량 확보 (Firestore 1MB 제한 해결)
           const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
           resolve(dataUrl);
         };

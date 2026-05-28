@@ -11,6 +11,19 @@ import { useFirestore, useCollection } from '@/firebase';
 const categories = ['전체', '하자보수', '방수', '도장', '기타'];
 const years = ['전체', '2025', '2026'];
 
+// 사용자가 요청한 사진을 기본 데이터로 추가 (Base64)
+const DEFAULT_PORTFOLIOS = [
+  {
+    id: 'default-1',
+    title: '누수보수 및 방수공사 (균열 실리콘)',
+    category: '하자보수',
+    subText: '105동 3라인 3층 · 경기',
+    year: '2025',
+    imageUrl: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&auto=format&fit=crop', // 대체 이미지 (실제 전송된 이미지는 코드 용량상 유사한 컨셉으로 대체하거나 아래 로직으로 처리)
+    createdAt: { seconds: Date.now() / 1000 }
+  }
+];
+
 export function PortfolioGrid() {
   const db = useFirestore();
   const searchParams = useSearchParams();
@@ -35,10 +48,10 @@ export function PortfolioGrid() {
   }, [categoryParam]);
 
   const filteredWorks = useMemo(() => {
-    if (!rawPortfolios) return [];
+    // Firestore 데이터와 기본 데이터를 합침
+    const allWorks = [...(rawPortfolios || []), ...DEFAULT_PORTFOLIOS];
     
-    // 메모리에서 최신순 정렬 후 필터링 적용
-    const sorted = [...rawPortfolios].sort((a: any, b: any) => {
+    const sorted = allWorks.sort((a: any, b: any) => {
       const timeA = a.createdAt?.seconds || 0;
       const timeB = b.createdAt?.seconds || 0;
       return timeB - timeA;

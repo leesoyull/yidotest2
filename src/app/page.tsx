@@ -65,14 +65,6 @@ export default function Home() {
                     </p>
                   </div>
                 </RevealItem>
-
-                <RevealItem delay={400} className="pt-4">
-                  <Button asChild size="lg" className="h-12 px-8 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 text-base font-black transition-all hover:scale-105">
-                    <Link href="/inquiry" className="flex items-center gap-2">
-                      상담 문의하기 <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                </RevealItem>
               </div>
             </div>
             

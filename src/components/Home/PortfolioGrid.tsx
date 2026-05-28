@@ -1,8 +1,9 @@
 
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { RevealItem } from '../SectionReveal';
@@ -19,7 +20,17 @@ const works = [
 ];
 
 export function PortfolioGrid() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
   const [filter, setFilter] = useState('전체');
+
+  useEffect(() => {
+    if (categoryParam && categories.includes(categoryParam)) {
+      setFilter(categoryParam);
+    } else {
+      setFilter('전체');
+    }
+  }, [categoryParam]);
 
   const filteredWorks = works.filter(w => filter === '전체' || w.cat === filter);
 

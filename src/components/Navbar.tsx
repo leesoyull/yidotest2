@@ -20,10 +20,19 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: '회사소개', href: '/#about', sub: ['인사말', '연혁', '경영방침'] },
-    { name: '사업분야', href: '/#business', sub: ['하자보수', '방수공사', '도장공사', '시설관리'] },
-    { name: '시공사례', href: '/#portfolio', sub: ['전체보기', '방수', '도장'] },
-    { name: '문의하기', href: '/inquiry', sub: ['견적요청', '상담신청'] },
+    { name: '회사소개', href: '/#about', sub: [] },
+    { name: '사업분야', href: '/#business', sub: [] },
+    { 
+      name: '시공사례', 
+      href: '/portfolio', 
+      sub: [
+        { name: '전체보기', href: '/portfolio' },
+        { name: '하자보수', href: '/portfolio?category=하자보수' },
+        { name: '방수', href: '/portfolio?category=방수' },
+        { name: '도장', href: '/portfolio?category=도장' },
+        { name: '기타', href: '/portfolio?category=기타' }
+      ] 
+    },
   ];
 
   return (
@@ -56,17 +65,23 @@ export function Navbar() {
                 )}
               >
                 {link.name}
-                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />
+                {link.sub.length > 0 && <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform" />}
               </Link>
-              <div className="absolute top-full left-0 pt-4 hidden group-hover:block">
-                <div className="bg-white shadow-xl rounded-xl border p-4 w-48 flex flex-col gap-2">
-                  {link.sub.map((s) => (
-                    <Link key={s} href={link.href} className="text-xs hover:text-accent font-medium py-1 px-2 hover:bg-muted rounded-md transition-all text-primary">
-                      {s}
-                    </Link>
-                  ))}
+              {link.sub.length > 0 && (
+                <div className="absolute top-full left-0 pt-4 hidden group-hover:block">
+                  <div className="bg-white shadow-xl rounded-xl border p-4 w-48 flex flex-col gap-2">
+                    {link.sub.map((s) => (
+                      <Link 
+                        key={s.name} 
+                        href={s.href} 
+                        className="text-xs hover:text-accent font-medium py-1 px-2 hover:bg-muted rounded-md transition-all text-primary"
+                      >
+                        {s.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
           <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold rounded-full px-6 border-none">
@@ -84,14 +99,25 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b shadow-xl p-6 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
-              onClick={() => setIsOpen(false)}
-              className="text-lg font-semibold border-b pb-2 text-primary"
-            >
-              {link.name}
-            </Link>
+            <div key={link.name} className="flex flex-col gap-2">
+              <Link 
+                href={link.href} 
+                onClick={() => setIsOpen(false)}
+                className="text-lg font-semibold text-primary"
+              >
+                {link.name}
+              </Link>
+              {link.sub.map((s) => (
+                <Link 
+                  key={s.name} 
+                  href={s.href} 
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm pl-4 text-muted-foreground"
+                >
+                  - {s.name}
+                </Link>
+              ))}
+            </div>
           ))}
           <Button className="w-full rounded-full" asChild onClick={() => setIsOpen(false)}>
             <Link href="/inquiry">무료 견적 받기</Link>

@@ -37,7 +37,7 @@ export default function Home() {
             <div className="space-y-8">
               <RevealItem>
                 <span className="text-accent font-bold text-xs tracking-widest uppercase">Company Intro</span>
-                <h2 className="font-headline text-4xl md:text-6xl font-black mt-4 leading-tight text-primary">
+                <h2 className="font-brush text-5xl md:text-7xl mt-4 leading-tight text-primary">
                   이도 (利道)
                 </h2>
               </RevealItem>
@@ -46,12 +46,14 @@ export default function Home() {
                   <p className="font-bold text-primary text-xl">
                     이롭고 바른 길을 함께 걷겠습니다
                   </p>
-                  <p className="font-light">
-                    이도건설의 사명 '이도(利道)'는 '이로울 이(利)'와 '길 도(道)'로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 뜻을 담고 있습니다. 작은 공사 하나도 정직하고 성실하게 완수하는 것을 최우선 가치로 삼습니다.
-                  </p>
-                  <p className="font-light">
-                    건물 하자보수, 시설물 유지관리, 방수·도장 등 건물 전반의 유지보수 분야에서 고객의 신뢰를 얻기 위해 최선을 다하겠습니다.
-                  </p>
+                  <div className="font-light space-y-4">
+                    <p>
+                      이도건설의 사명 '이도(利道)'는 '이로울 이(利)'와 '길 도(道)'로, 고객과 함께 이롭고 바른 길을 걸어가겠다는 뜻을 담고 있습니다. 작은 공사 하나도 정직하고 성실하게 완수하는 것을 최우선 가치로 삼습니다.
+                    </p>
+                    <p>
+                      건물 하자보수, 시설물 유지관리, 방수·도장 등 건물 전반의 유지보수 분야에서 고객의 신뢰를 얻기 위해 최선을 다하겠습니다.
+                    </p>
+                  </div>
                 </div>
               </RevealItem>
               <RevealItem delay={200}>

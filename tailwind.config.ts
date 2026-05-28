@@ -13,6 +13,7 @@ export default {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
         headline: ['Space Grotesk', 'sans-serif'],
+        brush: ['"Nanum Brush Script"', 'cursive'],
         code: ['monospace'],
       },
       colors: {

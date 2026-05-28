@@ -1,8 +1,8 @@
+
 "use client"
 
-import { useState } from 'react';
-import { useAuth, useUser, useFirestore, useCollection } from '@/firebase';
-import { signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import { useFirestore, useCollection } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,24 +10,35 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
-import { Trash2, Plus, LogOut, LayoutDashboard, Image as ImageIcon, Mail, Phone, Clock, User, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, LogOut, LayoutDashboard, Image as ImageIcon, Mail, Phone, Clock, User, ArrowLeft, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function AdminPage() {
-  const auth = useAuth();
   const db = useFirestore();
-  const { user, loading: userLoading } = useUser();
   const { toast } = useToast();
+  
+  // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [adminId, setAdminId] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [newPortfolio, setNewPortfolio] = useState({
     title: '',
     category: '',
     subText: '',
     imageUrl: ''
   });
+
+  // 세션 유지를 위해 로컬 스토리지 확인
+  useEffect(() => {
+    const savedLogin = sessionStorage.getItem('yido_admin_login');
+    if (savedLogin === 'true') {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   // 실시간 데이터 바인딩
   const portfolioQuery = query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
@@ -36,23 +47,24 @@ export default function AdminPage() {
   const inquiryQuery = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
   const { data: inquiries, loading: inquiriesLoading } = useCollection(inquiryQuery);
 
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      toast({ title: "로그인 성공", description: "관리자 모드로 전환되었습니다." });
-    } catch (error: any) {
-      console.error(error);
+  const handleManualLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminId === 'yido610' && adminPassword === 'yido610!') {
+      setIsLoggedIn(true);
+      sessionStorage.setItem('yido_admin_login', 'true');
+      toast({ title: "로그인 성공", description: "관리자 모드로 접속되었습니다." });
+    } else {
       toast({ 
         variant: "destructive", 
         title: "로그인 실패", 
-        description: "Google 로그인을 사용할 수 없습니다." 
+        description: "아이디 또는 비밀번호가 일치하지 않습니다." 
       });
     }
   };
 
   const handleLogout = () => {
-    signOut(auth);
+    setIsLoggedIn(false);
+    sessionStorage.removeItem('yido_admin_login');
     toast({ title: "로그아웃", description: "안전하게 로그아웃되었습니다." });
   };
 
@@ -98,27 +110,44 @@ export default function AdminPage() {
     }
   };
 
-  if (userLoading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-    </div>
-  );
-
-  if (!user) {
+  if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full shadow-2xl border-none">
-          <CardHeader className="text-center space-y-4">
+        <Card className="max-w-md w-full shadow-2xl border-none rounded-3xl overflow-hidden">
+          <CardHeader className="text-center space-y-4 pt-10">
             <div className="bg-primary/10 w-16 h-16 rounded-3xl flex items-center justify-center text-primary mx-auto mb-2">
-              <LayoutDashboard className="w-8 h-8" />
+              <Lock className="w-8 h-8" />
             </div>
             <CardTitle className="text-2xl font-black">이도건설 관리자</CardTitle>
-            <CardDescription>보안을 위해 관리자 계정으로 로그인해 주세요.</CardDescription>
+            <CardDescription>아이디와 비밀번호를 입력해 주세요.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Button onClick={handleLogin} className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20">
-              구글 계정으로 로그인
-            </Button>
+          <CardContent className="space-y-6 pb-10">
+            <form onSubmit={handleManualLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="adminId">아이디</Label>
+                <Input 
+                  id="adminId" 
+                  value={adminId} 
+                  onChange={(e) => setAdminId(e.target.value)}
+                  placeholder="아이디 입력"
+                  className="h-12 rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="adminPassword">비밀번호</Label>
+                <Input 
+                  id="adminPassword" 
+                  type="password"
+                  value={adminPassword} 
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="비밀번호 입력"
+                  className="h-12 rounded-xl"
+                />
+              </div>
+              <Button type="submit" className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 mt-4">
+                관리자 로그인
+              </Button>
+            </form>
             <Button asChild variant="ghost" className="w-full text-muted-foreground">
               <Link href="/"><ArrowLeft className="w-4 h-4 mr-2" /> 홈페이지로 돌아가기</Link>
             </Button>
@@ -138,7 +167,7 @@ export default function AdminPage() {
             </div>
             <div>
               <h1 className="text-2xl font-black text-primary uppercase tracking-tight">Management</h1>
-              <p className="text-xs text-muted-foreground font-medium">{user.email}</p>
+              <p className="text-xs text-muted-foreground font-medium">관리자 계정 접속 중</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

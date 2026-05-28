@@ -81,33 +81,33 @@ export default function InquiryPage() {
   return (
     <main className="min-h-screen bg-muted/30">
       <Navbar />
-      <div className="pt-32 pb-20 container mx-auto px-6">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-3 gap-12">
+      <div className="pt-24 pb-16 container mx-auto px-6">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-3 gap-10">
           {/* Contact Info */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <h1 className="font-headline text-4xl font-bold text-primary mb-4">문의하기</h1>
-              <p className="text-muted-foreground leading-relaxed">
+              <h1 className="font-headline text-3xl font-bold text-primary mb-3">문의하기</h1>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 건물의 안전과 가치를 지키는 이도건설입니다.
               </p>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-3 rounded-xl text-primary">
-                  <Mail className="w-5 h-5" />
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                  <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm">이메일</h4>
+                  <h4 className="font-bold text-xs uppercase tracking-wider">이메일</h4>
                   <p className="text-muted-foreground text-sm">yido610@naver.com</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 p-3 rounded-xl text-primary">
-                  <MapPin className="w-5 h-5" />
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                  <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm">방문 지역</h4>
+                  <h4 className="font-bold text-xs uppercase tracking-wider">방문 지역</h4>
                   <p className="text-muted-foreground text-sm">전국 현장 방문 가능</p>
                 </div>
               </div>
@@ -117,51 +117,54 @@ export default function InquiryPage() {
           {/* Form */}
           <div className="lg:col-span-2">
             <Card className="border-none shadow-xl rounded-2xl">
-              <CardHeader className="bg-primary text-white rounded-t-2xl">
-                <CardTitle className="text-2xl">견적 및 상담 신청</CardTitle>
-                <CardDescription className="text-white/70">정확한 정보를 입력해주시면 신속한 대응이 가능합니다.</CardDescription>
+              <CardHeader className="bg-primary text-white rounded-t-2xl py-6">
+                <CardTitle className="text-xl">견적 및 상담 신청</CardTitle>
+                <CardDescription className="text-white/70 text-xs">정확한 정보를 입력해주시면 신속한 대응이 가능합니다.</CardDescription>
               </CardHeader>
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">성함/업체명 *</Label>
+              <CardContent className="p-6 md:p-8">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="name" className="text-xs font-bold">성함/업체명 *</Label>
                       <Input 
                         id="name" 
                         placeholder="홍길동" 
+                        className="h-11"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">연락처 *</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="phone" className="text-xs font-bold">연락처 *</Label>
                       <Input 
                         id="phone" 
                         placeholder="010-0000-0000" 
+                        className="h-11"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                       />
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">이메일</Label>
+                  <div className="grid md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="email" className="text-xs font-bold">이메일</Label>
                       <Input 
                         id="email" 
                         type="email" 
                         placeholder="example@email.com" 
+                        className="h-11"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="serviceType">문의 분야 *</Label>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="serviceType" className="text-xs font-bold">문의 분야 *</Label>
                       <Select 
                         onValueChange={(value) => setFormData({...formData, serviceType: value})}
                         value={formData.serviceType}
                       >
-                        <SelectTrigger id="serviceType">
+                        <SelectTrigger id="serviceType" className="h-11">
                           <SelectValue placeholder="분야 선택" />
                         </SelectTrigger>
                         <SelectContent>
@@ -175,12 +178,12 @@ export default function InquiryPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="content">문의 내용 *</Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="content" className="text-xs font-bold">문의 내용 *</Label>
                     <Textarea 
                       id="content" 
                       placeholder="공사 내용, 지역, 건물 유형 등을 자세히 적어주세요." 
-                      className="min-h-[200px]"
+                      className="min-h-[150px] text-sm"
                       value={formData.content}
                       onChange={(e) => setFormData({...formData, content: e.target.value})}
                     />
@@ -188,11 +191,11 @@ export default function InquiryPage() {
 
                   <Button 
                     type="submit" 
-                    className="w-full h-14 bg-accent hover:bg-accent/90 text-lg font-bold rounded-xl"
+                    className="w-full h-12 bg-accent hover:bg-accent/90 text-base font-bold rounded-xl shadow-lg shadow-accent/20"
                     disabled={loading}
                   >
                     {loading ? "전송 중..." : "문의 신청하기"}
-                    {!loading && <Send className="ml-2 w-5 h-5" />}
+                    {!loading && <Send className="ml-2 w-4 h-4" />}
                   </Button>
                 </form>
               </CardContent>

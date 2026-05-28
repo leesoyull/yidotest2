@@ -2,7 +2,6 @@
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Home/Hero';
 import { SectionReveal, RevealItem } from '@/components/SectionReveal';
-import { DiagnosticTool } from '@/components/Home/DiagnosticTool';
 import { BusinessGrid } from '@/components/Home/BusinessGrid';
 import { PortfolioGrid } from '@/components/Home/PortfolioGrid';
 import { StatsBand } from '@/components/Home/StatsBand';
@@ -29,31 +28,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* AI Diagnostic Tool Section */}
-      <SectionReveal id="diagnostic" className="bg-gradient-to-b from-white to-background">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <RevealItem>
-              <span className="text-accent font-bold text-xs tracking-widest uppercase py-1 px-4 bg-accent/10 rounded-full border border-accent/20">
-                Next-Gen Tool
-              </span>
-            </RevealItem>
-            <RevealItem delay={100}>
-              <h2 className="font-headline text-4xl md:text-5xl font-bold">스마트 AI 진단 시스템</h2>
-            </RevealItem>
-            <RevealItem delay={200}>
-              <p className="text-muted-foreground text-lg font-light leading-relaxed">
-                정확한 현장 방문 전, AI를 통해 문제의 원인을 즉시 파악하고 <br className="hidden md:block"/>
-                필요한 시공 절차에 대한 가이드를 받아보세요.
-              </p>
-            </RevealItem>
-          </div>
-          <RevealItem delay={300}>
-            <DiagnosticTool />
-          </RevealItem>
-        </div>
-      </SectionReveal>
-
       {/* About Section */}
       <SectionReveal id="about" className="bg-white">
         <div className="container mx-auto px-6">
@@ -78,7 +52,7 @@ export default function Home() {
               </RevealItem>
               <RevealItem delay={200}>
                 <Button asChild size="lg" className="h-14 px-8 rounded-full bg-primary hover:bg-primary/90">
-                  <Link href="#contact" className="flex items-center gap-2">
+                  <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php" className="flex items-center gap-2">
                     상담 문의하기 <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
@@ -156,7 +130,7 @@ export default function Home() {
             </RevealItem>
             <RevealItem delay={200}>
               <Button asChild size="lg" className="bg-white text-primary hover:bg-accent hover:text-white h-16 px-10 rounded-full text-lg font-black transition-all">
-                <Link href="mailto:yido610@naver.com">지금 바로 문의하기</Link>
+                <Link href="http://www.kumyoungenc.com/pc/customer/customer04.php">지금 바로 문의하기</Link>
               </Button>
             </RevealItem>
           </div>

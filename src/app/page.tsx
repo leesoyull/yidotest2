@@ -1,4 +1,3 @@
-
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Home/Hero';
 import { SectionReveal, RevealItem } from '@/components/SectionReveal';

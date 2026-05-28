@@ -1,28 +1,27 @@
 
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { RevealItem } from '../SectionReveal';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore, useCollection } from '@/firebase';
 
 const categories = ['전체', '하자보수', '방수', '도장', '기타'];
 
-const works = [
-  { id: 1, cat: '하자보수', title: '아파트 외벽 균열 보수', sub: '공동주택 · 경기도', img: 'port-crack-repair' },
-  { id: 2, cat: '방수', title: '옥상 우레탄 방수 공사', sub: '상업시설 · 경기도', img: 'port-waterproofing' },
-  { id: 3, cat: '도장', title: '빌라 외벽 도장 리뉴얼', sub: '다세대주택 · 경기도', img: 'port-painting' },
-  { id: 4, cat: '하자보수', title: '지하주차장 누수 보수', sub: '공동주택 · 경기도', img: 'port-parking-leak' },
-  { id: 5, cat: '방수', title: '욕실 방수 재시공', sub: '주거시설 · 경기도', img: 'port-bathroom' },
-  { id: 6, cat: '기타', title: '타일 탈락 교체 보수', sub: '상업시설 · 경기도', img: 'port-tile-repair' },
-];
-
 export function PortfolioGrid() {
+  const db = useFirestore();
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
   const [filter, setFilter] = useState('전체');
+
+  const portfolioQuery = useMemo(() => {
+    return query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
+  }, [db]);
+
+  const { data: portfolios, loading } = useCollection(portfolioQuery);
 
   useEffect(() => {
     if (categoryParam && categories.includes(categoryParam)) {
@@ -32,7 +31,26 @@ export function PortfolioGrid() {
     }
   }, [categoryParam]);
 
-  const filteredWorks = works.filter(w => filter === '전체' || w.cat === filter);
+  const filteredWorks = useMemo(() => {
+    if (!portfolios) return [];
+    return portfolios.filter(w => filter === '전체' || w.category === filter);
+  }, [portfolios, filter]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!portfolios || portfolios.length === 0) {
+    return (
+      <div className="text-center py-20 text-muted-foreground">
+        등록된 시공 사례가 없습니다.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12">
@@ -59,18 +77,17 @@ export function PortfolioGrid() {
             <div className="bg-white rounded-2xl overflow-hidden border shadow-sm group-hover:shadow-xl transition-all duration-500">
               <div className="relative h-64 overflow-hidden">
                 <Image
-                  src={PlaceHolderImages.find(p => p.id === work.img)?.imageUrl || ''}
+                  src={work.imageUrl}
                   alt={work.title}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  data-ai-hint={PlaceHolderImages.find(p => p.id === work.img)?.imageHint}
                 />
                 <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  {work.cat}
+                  {work.category}
                 </div>
               </div>
               <div className="p-6">
-                <div className="text-xs text-accent font-bold mb-2 uppercase tracking-tight">{work.sub}</div>
+                <div className="text-xs text-accent font-bold mb-2 uppercase tracking-tight">{work.subText}</div>
                 <h4 className="text-lg font-bold text-primary group-hover:text-accent transition-colors mb-4">{work.title}</h4>
                 <div className="flex justify-between items-center pt-4 border-t border-muted">
                    <span className="text-[10px] text-muted-foreground font-medium">시공 완료</span>

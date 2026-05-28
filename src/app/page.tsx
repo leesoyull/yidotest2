@@ -36,9 +36,10 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="space-y-12">
               <RevealItem>
-                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-12 block">Company Intro</span>
-                <h2 className="font-brush text-9xl text-primary leading-none flex items-baseline">
-                  이도 <span className="font-body text-3xl font-normal ml-6 opacity-60 tracking-normal">(利道)</span>
+                <span className="text-accent font-bold text-xs tracking-widest uppercase mb-16 block">Company Intro</span>
+                <h2 className="font-brush text-primary leading-none flex items-baseline">
+                  <span className="text-9xl">이도</span>
+                  <span className="font-body text-4xl font-normal ml-6 opacity-60 tracking-normal">(利道)</span>
                 </h2>
               </RevealItem>
               <RevealItem delay={100}>
@@ -56,7 +57,7 @@ export default function Home() {
                   </div>
                 </div>
               </RevealItem>
-              <RevealItem delay={200} className="pt-24">
+              <RevealItem delay={200} className="pt-32">
                 <Button asChild size="lg" className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
                   <Link href="/inquiry" className="flex items-center gap-2">
                     상담 문의하기 <ArrowRight className="w-4 h-4" />
@@ -111,7 +112,7 @@ export default function Home() {
               <span className="text-accent font-bold text-xs tracking-widest uppercase">Performance</span>
             </RevealItem>
             <RevealItem delay={100}>
-              <h2 className="font-headline text-4xl md:text-5xl font-bold">이도건설 시공 실적 현황</h2>
+              <h2 className="font-headline text-4xl md:text-5xl font-bold">시공 실적 현황</h2>
             </RevealItem>
             <RevealItem delay={200}>
               <p className="text-muted-foreground text-lg font-light">

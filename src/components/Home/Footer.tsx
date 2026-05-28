@@ -6,9 +6,9 @@ import { Mail, MapPin, Building2 } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-[#0d1f35] text-white/80 pt-12">
+    <footer className="bg-[#0d1f35] text-white/80 pt-8">
       <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-8 pb-10 border-b border-white/5">
+        <div className="grid md:grid-cols-2 gap-8 pb-6 border-b border-white/5">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-white">
               <div className="bg-primary p-1.5 rounded-lg">
@@ -22,21 +22,21 @@ export function Footer() {
           </div>
 
           <div className="md:text-right">
-            <h4 className="font-headline text-white font-bold text-sm tracking-widest mb-6 border-b border-white/10 pb-2 md:inline-block">CONTACT</h4>
-            <ul className="space-y-4 text-sm flex flex-col md:items-end">
+            <h4 className="font-headline text-white font-bold text-xs tracking-widest mb-4 border-b border-white/10 pb-1 md:inline-block">CONTACT</h4>
+            <ul className="space-y-2 text-sm flex flex-col md:items-end">
               <li className="flex items-start gap-3 justify-end">
-                <Mail className="w-5 h-5 text-accent flex-shrink-0" />
+                <Mail className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                 <a href="mailto:yido610@naver.com" className="hover:text-white transition-colors">yido610@naver.com</a>
               </li>
               <li className="flex items-start gap-3 justify-end">
-                <MapPin className="w-5 h-5 text-accent flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                 <span>전국 (현장 방문 상담 지원)</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="py-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex gap-6 text-[10px] text-white/30 uppercase tracking-widest">
             <span>&copy; {new Date().getFullYear()} YIDO CONSTRUCTION. ALL RIGHTS RESERVED.</span>
           </div>

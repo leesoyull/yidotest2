@@ -4,6 +4,9 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/firebaseConfig';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Home/Footer';
+import { SectionReveal, RevealItem } from '@/components/SectionReveal';
 
 interface Project {
   id: string;
@@ -11,6 +14,7 @@ interface Project {
   category: string;
   year: string;
   imageUrl: string;
+  location?: string;
 }
 
 export default function ProjectsPage() {
@@ -19,6 +23,7 @@ export default function ProjectsPage() {
   const [selectedYear, setSelectedYear] = useState('전체');
 
   useEffect(() => {
+    // 실시간 리스너 연결
     const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const projectData = snapshot.docs.map((doc) => ({
@@ -30,78 +35,121 @@ export default function ProjectsPage() {
     return () => unsubscribe();
   }, []);
 
-  // 사장님이 원하셨던 필터링 로직 (년 글자 포함 여부 체크로 안전하게 보정)
+  // 필터링 로직
   const filteredProjects = projects.filter((project) => {
-    const matchCategory = selectedCategory === '전체' || project.category === selectedCategory;
-    
-    // DB에 '2025년'으로 들어가든 '2025'로 들어가든 둘 다 잡히도록 수정!
     const projectYearClean = project.year ? project.year.replace('년', '') : '';
+    const matchCategory = selectedCategory === '전체' || project.category === selectedCategory;
     const matchYear = selectedYear === '전체' || projectYearClean === selectedYear;
-    
     return matchCategory && matchYear;
   });
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">이도건설 시공 사례</h1>
+    <main className="min-h-screen bg-white">
+      {/* 상단 내비게이션 */}
+      <Navbar />
 
-      {/* 사장님 맞춤 필터 조작 버튼 영역 */}
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-8 bg-gray-50 p-4 rounded-lg border border-gray-100">
-        <div className="flex items-center flex-wrap">
-          <span className="font-semibold mr-2 text-gray-700">구분:</span>
-          {['전체', '하자보수', '방수', '도장', '기타'].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 m-1 rounded-full text-sm font-medium transition ${
-                selectedCategory === cat ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
-              }`}
-            >
-              {cat === '전체' ? '전체보기' : cat}
-            </button>
-          ))}
-        </div>
+      <div className="pt-32 pb-24">
+        <SectionReveal className="py-0">
+          <div className="container mx-auto px-6">
+            <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+              <RevealItem>
+                <span className="text-accent font-bold text-xs tracking-widest uppercase">Performance & Portfolio</span>
+              </RevealItem>
+              <RevealItem delay={100}>
+                <h2 className="font-headline text-4xl md:text-5xl font-bold text-primary">이도건설 시공 사례</h2>
+              </RevealItem>
+              <RevealItem delay={200}>
+                <p className="text-muted-foreground text-base font-light">
+                  정직한 마음과 숙련된 기술로 완수해온 이도건설의 발자취입니다.<br/>
+                  각 연도별, 분야별 시공 내역을 투명하게 공개합니다.
+                </p>
+              </RevealItem>
+            </div>
 
-        <div className="flex items-center flex-wrap">
-          <span className="font-semibold mr-2 text-gray-700">연도:</span>
-          {['전체', '2026', '2025', '2024'].map((yr) => (
-            <button
-              key={yr}
-              onClick={() => setSelectedYear(yr)}
-              className={`px-3 py-1 m-1 rounded-full text-sm font-medium transition ${
-                selectedYear === yr ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
-              }`}
-            >
-              {yr === '전체' ? '전체' : `${yr}년`}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 사진 리스트 자동 출력 영역 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {filteredProjects.length === 0 ? (
-          <div className="text-center text-gray-500 col-span-3 py-16 bg-gray-50 rounded-xl border border-dashed">
-            <p className="text-lg font-medium">해당 조건의 시공 사례가 아직 없습니다.</p>
-            <p className="text-sm text-gray-400 mt-1">관리자 페이지에서 첫 사례를 등록해 보세요!</p>
-          </div>
-        ) : (
-          filteredProjects.map((project) => (
-            <div key={project.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-200">
-              <img src={project.imageUrl} alt={project.title} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <div className="flex gap-2">
-                  <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{project.category}</span>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-                    {project.year.includes('년') ? project.year : `${project.year}년`}
-                  </span>
+            {/* 필터 조작 영역 */}
+            <div className="flex flex-col gap-6 mb-16 bg-muted/30 p-8 rounded-[2rem] border border-muted/50">
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <span className="font-bold text-primary text-sm min-w-[60px]">시공 분야</span>
+                <div className="flex flex-wrap gap-2">
+                  {['전체', '하자보수', '방수', '도장', '기타'].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
+                        selectedCategory === cat 
+                        ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                        : 'bg-white text-muted-foreground border hover:border-accent hover:text-accent'
+                      }`}
+                    >
+                      {cat === '전체' ? '전체보기' : cat}
+                    </button>
+                  ))}
                 </div>
-                <h3 className="text-base font-semibold mt-2.5 text-gray-900 line-clamp-2">{project.title}</h3>
+              </div>
+
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <span className="font-bold text-primary text-sm min-w-[60px]">시공 연도</span>
+                <div className="flex flex-wrap gap-2">
+                  {['전체', '2026', '2025', '2024'].map((yr) => (
+                    <button
+                      key={yr}
+                      onClick={() => setSelectedYear(yr)}
+                      className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
+                        selectedYear === yr 
+                        ? 'bg-accent text-white shadow-lg shadow-accent/20' 
+                        : 'bg-white text-muted-foreground border hover:bg-muted'
+                      }`}
+                    >
+                      {yr === '전체' ? '전체 연도' : `${yr}년`}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          ))
-        )}
+
+            {/* 리스트 출력 영역 */}
+            {filteredProjects.length === 0 ? (
+              <div className="text-center py-32 bg-muted/10 rounded-[3rem] border-2 border-dashed border-muted">
+                <p className="text-lg font-bold text-primary/50">해당 조건의 시공 사례가 아직 없습니다.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredProjects.map((project, i) => (
+                  <RevealItem key={project.id} delay={i * 50} className="group">
+                    <div className="bg-white rounded-[2rem] overflow-hidden border border-muted shadow-sm hover:shadow-2xl transition-all duration-500">
+                      <div className="relative h-64 overflow-hidden">
+                        <img 
+                          src={project.imageUrl} 
+                          alt={project.title} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                        />
+                        <div className="absolute top-4 left-4 bg-primary/90 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full">
+                          {project.category}
+                        </div>
+                        <div className="absolute top-4 right-4 bg-accent/90 backdrop-blur-sm text-white text-[10px] font-black px-3 py-1.5 rounded-full">
+                          {project.year.includes('년') ? project.year : `${project.year}년`}
+                        </div>
+                      </div>
+                      <div className="p-8">
+                        <h3 className="text-xl font-black text-primary group-hover:text-accent transition-colors line-clamp-2 min-h-[3.5rem] mb-4">
+                          {project.title}
+                        </h3>
+                        <div className="flex justify-between items-center pt-6 border-t border-muted">
+                          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Construction Completed</span>
+                          <span className="text-accent group-hover:translate-x-2 transition-transform">→</span>
+                        </div>
+                      </div>
+                    </div>
+                  </RevealItem>
+                ))}
+              </div>
+            )}
+          </div>
+        </SectionReveal>
       </div>
-    </div>
+
+      {/* 하단 푸터 */}
+      <Footer />
+    </main>
   );
 }

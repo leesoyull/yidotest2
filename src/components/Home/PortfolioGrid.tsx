@@ -4,8 +4,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { RevealItem } from '../SectionReveal';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '@/firebaseConfig';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { MapPin } from 'lucide-react';
 
 const categories = ['전체', '하자보수', '방수', '도장', '기타'];
 const years = ['전체', '2025', '2026'];
@@ -21,21 +22,37 @@ interface Project {
 }
 
 export function PortfolioGrid() {
+  const db = useFirestore();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [catFilter, setCatFilter] = useState('전체');
   const [yearFilter, setYearFilter] = useState('전체');
 
   useEffect(() => {
-    // portfolios 대신 projects 컬렉션을 사용하도록 통일
-    const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Project[];
-      setProjects(data);
+    // 인덱스 오류 방지를 위해 단순 쿼리 후 클라이언트 사이드 정렬
+    const projectsRef = collection(db, 'projects');
+    const unsubscribe = onSnapshot(projectsRef, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      })) as Project[];
+      
+      // 최신순 정렬 (createdAt 기준)
+      const sortedData = data.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      });
+      
+      setProjects(sortedData);
+      setLoading(false);
+    }, (error) => {
+      console.error("Portfolio fetch error:", error);
       setLoading(false);
     });
+
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
   const filteredWorks = useMemo(() => {
     return projects.filter(w => {

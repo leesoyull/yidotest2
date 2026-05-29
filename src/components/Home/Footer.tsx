@@ -14,7 +14,7 @@ export function Footer() {
               <Logo variant="light" className="scale-90 origin-left" />
             </Link>
             <div className="text-[11px] font-bold text-white/40 tracking-[0.2em] pl-1 uppercase">
-              대표이사 : 이소율 | 이도건설 (YIDO CONSTRUCTION)
+              대표이사 : LEE SOYUL | 이도건설 (YIDO CONSTRUCTION)
             </div>
           </div>
 

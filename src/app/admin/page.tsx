@@ -1,10 +1,10 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { db, storage } from '@/firebaseConfig';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Home/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Plus, Image as ImageIcon, MessageSquare, Trash2, Calendar, MapPin, User, Phone, Mail } from 'lucide-react';
+import { Loader2, Plus, Image as ImageIcon, MessageSquare, Trash2, Calendar, MapPin, User, Phone, Mail, LayoutGrid, FileText } from 'lucide-react';
 
 interface Inquiry {
   id: string;
@@ -23,6 +23,17 @@ interface Inquiry {
   email: string;
   serviceType: string;
   content: string;
+  createdAt: any;
+}
+
+interface Project {
+  id: string;
+  title: string;
+  category: string;
+  year: string;
+  imageUrl: string;
+  location?: string;
+  storagePath?: string;
   createdAt: any;
 }
 
@@ -42,21 +53,32 @@ export default function AdminPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // 상담 내역 상태
+  // 실시간 데이터 상태
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  // 상담 내역 실시간 리스너
+  // 데이터 실시간 리스너 (상담 문의 & 시공 사례)
   useEffect(() => {
     if (!isLoggedIn) return;
-    const q = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Inquiry[];
+
+    // 상담 문의 리스너
+    const qInquiries = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'));
+    const unsubscribeInquiries = onSnapshot(qInquiries, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Inquiry[];
       setInquiries(data);
     });
-    return () => unsubscribe();
+
+    // 시공 사례 리스너
+    const qProjects = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+    const unsubscribeProjects = onSnapshot(qProjects, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Project[];
+      setProjects(data);
+    });
+
+    return () => {
+      unsubscribeInquiries();
+      unsubscribeProjects();
+    };
   }, [isLoggedIn]);
 
   // 로그인 체크
@@ -86,28 +108,27 @@ export default function AdminPage() {
   // 시공사례 등록
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!image || !title || !category) return toast({ variant: "destructive", title: "입력 오류", description: "모든 항목을 입력해 주세요." });
+    if (!image || !title || !category) return toast({ variant: "destructive", title: "입력 오류", description: "모든 필수 항목을 입력해 주세요." });
 
     setLoading(true);
     try {
-      // 1. 이미지 저장 (Firebase Storage)
-      const storageRef = ref(storage, `projects/${Date.now()}_${image.name}`);
+      const storagePath = `projects/${Date.now()}_${image.name}`;
+      const storageRef = ref(storage, storagePath);
       await uploadBytes(storageRef, image);
       const imageUrl = await getDownloadURL(storageRef);
 
-      // 2. Firestore 저장
       await addDoc(collection(db, 'projects'), {
         title,
         category,
         location,
         year: year.replace('년', ''),
         imageUrl,
+        storagePath,
         createdAt: serverTimestamp(),
       });
 
       toast({ title: "등록 완료", description: "새 시공 사례가 홈페이지에 반영되었습니다." });
       
-      // 초기화
       setTitle('');
       setCategory('');
       setLocation('');
@@ -122,12 +143,29 @@ export default function AdminPage() {
     }
   };
 
-  // 문의 내역 삭제
+  // 데이터 삭제 (상담 문의)
   const handleDeleteInquiry = async (id: string) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+    if (!confirm('정말 삭제하시겠습니까? 삭제된 상담 내용은 복구할 수 없습니다.')) return;
     try {
       await deleteDoc(doc(db, 'inquiries', id));
       toast({ title: "삭제 완료", description: "상담 내역이 삭제되었습니다." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "오류", description: "삭제 중 문제가 발생했습니다." });
+    }
+  };
+
+  // 데이터 삭제 (시공 사례)
+  const handleDeleteProject = async (project: Project) => {
+    if (!confirm(`'${project.title}' 시공 사례를 삭제하시겠습니까?`)) return;
+    try {
+      // 1. Storage 이미지 삭제 (경로가 있는 경우)
+      if (project.storagePath) {
+        const imageRef = ref(storage, project.storagePath);
+        await deleteObject(imageRef).catch(err => console.warn('Storage image not found', err));
+      }
+      // 2. Firestore 문서 삭제
+      await deleteDoc(doc(db, 'projects', project.id));
+      toast({ title: "삭제 완료", description: "시공 사례가 삭제되었습니다." });
     } catch (error) {
       toast({ variant: "destructive", title: "오류", description: "삭제 중 문제가 발생했습니다." });
     }
@@ -169,25 +207,23 @@ export default function AdminPage() {
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-muted pb-8">
             <div>
               <h1 className="text-4xl font-black text-primary tracking-tight">관리자 대시보드</h1>
-              <p className="text-muted-foreground mt-2 font-medium">이도건설의 모든 데이터와 현황을 한눈에 관리합니다.</p>
-            </div>
-            <div className="flex gap-2">
-              <div className="bg-white px-4 py-2 rounded-xl border border-muted shadow-sm flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-accent" />
-                <span className="text-sm font-bold text-primary">미확인 문의: {inquiries.length}건</span>
-              </div>
+              <p className="text-muted-foreground mt-2 font-medium">이도건설의 모든 비즈니스 데이터를 실시간으로 관리합니다.</p>
             </div>
           </header>
 
           <Tabs defaultValue="inquiries" className="space-y-8">
-            <TabsList className="bg-white border p-1 rounded-2xl h-16 shadow-sm">
-              <TabsTrigger value="inquiries" className="rounded-xl h-full px-8 text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+            <TabsList className="bg-white border p-1 rounded-2xl h-16 shadow-sm overflow-x-auto inline-flex w-full md:w-auto">
+              <TabsTrigger value="inquiries" className="rounded-xl h-full px-6 text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all whitespace-nowrap">
                 <MessageSquare className="w-4 h-4 mr-2" />
-                상담 문의 관리
+                상담 문의 관리 ({inquiries.length})
               </TabsTrigger>
-              <TabsTrigger value="projects" className="rounded-xl h-full px-8 text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+              <TabsTrigger value="upload" className="rounded-xl h-full px-6 text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all whitespace-nowrap">
                 <Plus className="w-4 h-4 mr-2" />
                 새 시공사례 등록
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="rounded-xl h-full px-6 text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all whitespace-nowrap">
+                <LayoutGrid className="w-4 h-4 mr-2" />
+                시공 사례 관리 ({projects.length})
               </TabsTrigger>
             </TabsList>
 
@@ -204,7 +240,7 @@ export default function AdminPage() {
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-xs font-bold text-accent uppercase tracking-widest">
                             <Calendar className="w-3 h-3" />
-                            {item.createdAt?.toDate().toLocaleDateString() || '방금 전'}
+                            {item.createdAt?.toDate().toLocaleDateString() || '저장 중...'}
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xl font-black text-primary flex items-center gap-2">
@@ -215,20 +251,14 @@ export default function AdminPage() {
                               <Phone className="w-3 h-3" />
                               {item.phone}
                             </p>
-                            {item.email && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-2">
-                                <Mail className="w-3 h-3" />
-                                {item.email}
-                              </p>
-                            )}
                           </div>
-                          <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full">
+                          <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-tighter">
                             {item.serviceType}
                           </div>
                         </div>
                         <div className="md:col-span-2 bg-muted/30 p-6 rounded-2xl">
-                          <p className="text-sm text-primary leading-relaxed whitespace-pre-wrap font-medium">
-                            {item.content}
+                          <p className="text-sm text-primary leading-relaxed whitespace-pre-wrap font-medium italic">
+                            "{item.content}"
                           </p>
                         </div>
                         <div className="flex items-center justify-end">
@@ -248,7 +278,7 @@ export default function AdminPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="projects">
+            <TabsContent value="upload">
               <div className="grid lg:grid-cols-2 gap-10">
                 <Card className="border-none shadow-xl rounded-[2.5rem]">
                   <CardHeader className="p-10 pb-0">
@@ -310,25 +340,39 @@ export default function AdminPage() {
 
                       <div className="space-y-4">
                         <Label className="text-sm font-bold text-primary pl-1">시공 사진 첨부 *</Label>
-                        <div className="relative group">
+                        <div 
+                          className="relative group"
+                          onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('border-accent'); }}
+                          onDragLeave={(e) => { e.preventDefault(); e.currentTarget.classList.remove('border-accent'); }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.classList.remove('border-accent');
+                            const file = e.dataTransfer.files?.[0];
+                            if (file) {
+                              setImage(file);
+                              const reader = new FileReader();
+                              reader.onloadend = () => setImagePreview(reader.result as string);
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        >
                           <Input 
                             type="file" 
                             accept="image/*" 
                             onChange={handleImageChange}
                             className="hidden" 
                             id="project-image"
-                            required={!image}
                           />
                           <label 
                             htmlFor="project-image"
-                            className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-muted rounded-2xl cursor-pointer bg-muted/10 group-hover:bg-muted/20 group-hover:border-accent transition-all overflow-hidden"
+                            className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-muted rounded-2xl cursor-pointer bg-muted/10 group-hover:bg-muted/20 group-hover:border-accent transition-all overflow-hidden"
                           >
                             {imagePreview ? (
                               <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                             ) : (
                               <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                <ImageIcon className="w-8 h-8" />
-                                <span className="text-sm font-bold">사진 클릭하여 업로드</span>
+                                <ImageIcon className="w-10 h-10" />
+                                <span className="text-sm font-bold">사진을 드래그하거나 클릭하여 업로드</span>
                               </div>
                             )}
                           </label>
@@ -343,36 +387,54 @@ export default function AdminPage() {
                         {loading ? (
                           <>
                             <Loader2 className="mr-3 w-6 h-6 animate-spin" />
-                            업로드 중...
+                            데이터 저장 중...
                           </>
                         ) : (
-                          "시공 사례 등록하기"
+                          "시공 사례 등록 완료"
                         )}
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
+              </div>
+            </TabsContent>
 
-                <div className="hidden lg:block">
-                  <div className="sticky top-40 bg-primary p-12 rounded-[3rem] text-white space-y-8">
-                    <h3 className="text-3xl font-black leading-tight">관리자님,<br/>반갑습니다.</h3>
-                    <p className="text-white/70 font-medium leading-relaxed">
-                      이곳에서 등록하시는 시공 사례는 홈페이지의 '시공사례' 메뉴에 즉시 자동으로 분류되어 나타납니다.
-                      <br/><br/>
-                      상담 문의 탭에서는 고객들이 남긴 소중한 정보를 실시간으로 확인하고 관리하실 수 있습니다.
-                    </p>
-                    <div className="pt-8 grid grid-cols-2 gap-4">
-                      <div className="p-6 bg-white/10 rounded-3xl border border-white/10">
-                        <div className="text-xs font-bold text-white/50 uppercase tracking-widest mb-2">Total Inquiries</div>
-                        <div className="text-3xl font-black">{inquiries.length}</div>
-                      </div>
-                      <div className="p-6 bg-white/10 rounded-3xl border border-white/10">
-                        <div className="text-xs font-bold text-white/50 uppercase tracking-widest mb-2">Latest Action</div>
-                        <div className="text-sm font-black">Just Now</div>
-                      </div>
-                    </div>
+            <TabsContent value="projects">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {projects.length === 0 ? (
+                  <div className="col-span-full text-center py-32 bg-white rounded-[2rem] border-2 border-dashed">
+                    <p className="text-muted-foreground font-bold">등록된 시공 사례가 없습니다.</p>
                   </div>
-                </div>
+                ) : (
+                  projects.map((item) => (
+                    <Card key={item.id} className="border-none shadow-sm hover:shadow-lg transition-all rounded-2xl overflow-hidden group">
+                      <div className="relative h-48 overflow-hidden">
+                        <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <div className="absolute top-4 right-4 flex gap-2">
+                           <Button 
+                            variant="destructive" 
+                            size="icon" 
+                            className="h-10 w-10 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => handleDeleteProject(item)}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        </div>
+                        <div className="absolute bottom-4 left-4 flex gap-1">
+                          <span className="px-2 py-1 bg-primary text-white text-[9px] font-bold rounded uppercase">{item.category}</span>
+                          <span className="px-2 py-1 bg-accent text-white text-[9px] font-bold rounded">{item.year}년</span>
+                        </div>
+                      </div>
+                      <CardContent className="p-6">
+                        <h4 className="text-lg font-black text-primary line-clamp-1 mb-2">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
+                          <MapPin className="w-3 h-3" />
+                          {item.location || '위치 미지정'}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
             </TabsContent>
           </Tabs>

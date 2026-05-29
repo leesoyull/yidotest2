@@ -25,13 +25,13 @@ export function Navbar() {
     { name: '사업분야', href: '/#business', sub: [] },
     { 
       name: '시공사례', 
-      href: '/portfolio', 
+      href: '/projects', 
       sub: [
-        { name: '전체보기', href: '/portfolio' },
-        { name: '하자보수', href: '/portfolio?category=하자보수' },
-        { name: '방수', href: '/portfolio?category=방수' },
-        { name: '도장', href: '/portfolio?category=도장' },
-        { name: '기타', href: '/portfolio?category=기타' }
+        { name: '전체보기', href: 'projects' },
+        { name: '하자보수', href: '/projects?category=하자보수' },
+        { name: '방수', href: '/projects?category=방수' },
+        { name: '도장', href: '/projects?category=도장' },
+        { name: '기타', href: '/projects?category=기타' }
       ] 
     },
   ];

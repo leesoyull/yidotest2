@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { db, storage } from '../../firebase/firebaseConfig';
+import { db } from '@/firebaseConfig';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 interface Project {

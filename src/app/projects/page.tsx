@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { db } from '@/firebaseConfig';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { collection, query, onSnapshot } from 'firebase/firestore';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Home/Footer';
 import { SectionReveal, RevealItem } from '@/components/SectionReveal';
@@ -15,27 +15,30 @@ interface Project {
   year: string;
   imageUrl: string;
   location?: string;
+  createdAt: any;
 }
 
 export default function ProjectsPage() {
+  const db = useFirestore();
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedYear, setSelectedYear] = useState('전체');
 
   useEffect(() => {
-    // 실시간 리스너 연결
-    const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+    // 인스턴스 중복 방지를 위해 통합된 useFirestore를 사용합니다.
+    const q = collection(db, 'projects');
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const projectData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Project[];
-      setProjects(projectData);
+      
+      // 최신 등록 순으로 정렬
+      setProjects(projectData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
     });
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
-  // 필터링 로직
   const filteredProjects = projects.filter((project) => {
     const projectYearClean = project.year ? project.year.replace('년', '') : '';
     const matchCategory = selectedCategory === '전체' || project.category === selectedCategory;
@@ -45,9 +48,7 @@ export default function ProjectsPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* 상단 내비게이션 */}
       <Navbar />
-
       <div className="pt-32 pb-24">
         <SectionReveal className="py-0">
           <div className="container mx-auto px-6">
@@ -66,7 +67,6 @@ export default function ProjectsPage() {
               </RevealItem>
             </div>
 
-            {/* 필터 조작 영역 */}
             <div className="flex flex-col gap-6 mb-16 bg-muted/30 p-8 rounded-[2rem] border border-muted/50">
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 <span className="font-bold text-primary text-sm min-w-[60px]">시공 분야</span>
@@ -81,7 +81,7 @@ export default function ProjectsPage() {
                         : 'bg-white text-muted-foreground border hover:border-accent hover:text-accent'
                       }`}
                     >
-                      {cat === '전체' ? '전체보기' : cat}
+                      {cat}
                     </button>
                   ))}
                 </div>
@@ -90,7 +90,7 @@ export default function ProjectsPage() {
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 <span className="font-bold text-primary text-sm min-w-[60px]">시공 연도</span>
                 <div className="flex flex-wrap gap-2">
-                  {['전체', '2026', '2025', '2024'].map((yr) => (
+                  {['전체', '2026', '2025'].map((yr) => (
                     <button
                       key={yr}
                       onClick={() => setSelectedYear(yr)}
@@ -107,7 +107,6 @@ export default function ProjectsPage() {
               </div>
             </div>
 
-            {/* 리스트 출력 영역 */}
             {filteredProjects.length === 0 ? (
               <div className="text-center py-32 bg-muted/10 rounded-[3rem] border-2 border-dashed border-muted">
                 <p className="text-lg font-bold text-primary/50">해당 조건의 시공 사례가 아직 없습니다.</p>
@@ -147,8 +146,6 @@ export default function ProjectsPage() {
           </div>
         </SectionReveal>
       </div>
-
-      {/* 하단 푸터 */}
       <Footer />
     </main>
   );

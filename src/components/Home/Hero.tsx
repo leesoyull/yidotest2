@@ -46,14 +46,16 @@ export function Hero() {
             index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
-          <Image
-            src={slide.img?.imageUrl || ''}
-            alt="Hero Background"
-            fill
-            priority={index === 0}
-            className="object-cover opacity-40"
-            data-ai-hint={slide.img?.imageHint}
-          />
+         {slide.img?.imageUrl && (
+  <Image
+    src={slide.img?.imageUrl}
+    alt="Hero Background"
+    fill
+    priority={index === 0}
+    className="object-cover opacity-40"
+    data-ai-hint={slide.img?.imageHint}
+  />
+)}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent" />
           
           <div className="relative h-full container mx-auto px-6 flex flex-col justify-center items-start text-white">

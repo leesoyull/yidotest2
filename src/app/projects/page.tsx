@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '@/firebaseConfig';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import Link from 'next/link';
 
 interface ProjectItem {
@@ -23,10 +23,11 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     const projectsRef = collection(db, 'projects');
-    const q = query(projectsRef, orderBy('createdAt', 'desc'));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    
+    // ⭐ 시공년도 기준 수동 정렬을 위해 쿼리에서는 전체를 실시간으로 받아옵니다.
+    const unsubscribe = onSnapshot(projectsRef, (querySnapshot) => {
       const projectList: ProjectItem[] = [];
+      
       querySnapshot.forEach((docSnap) => {
         const data = docSnap.data();
         projectList.push({
@@ -38,6 +39,15 @@ export default function ProjectsPage() {
           description: data.description || data.location || '', 
         });
       });
+
+      // ⭐ [핵심 수술 영역] 업로드 날짜가 아닌, 진짜 '시공년도(year)' 최신순으로 완벽 정렬합니다!
+      // 2030년 시공이 2025년 시공보다 무조건 맨 앞에 뜨게 만듭니다.
+      projectList.sort((a, b) => {
+        const yearA = parseInt(a.year) || 0;
+        const yearB = parseInt(b.year) || 0;
+        return yearB - yearA; // 내림차순 정렬 (큰 숫자가 맨 앞으로)
+      });
+
       setProjects(projectList);
       setLoading(false);
     }, (error) => {
@@ -63,14 +73,12 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-white">
       
-      {/* ⭐ [로고 업데이트] 메인 홈페이지와 100% 동일한 정식 로고 헤더 */}
+      {/* 상단 헤더 영역 */}
       <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
-          {/* 메인 로고 영역: 정식 집 모양 심볼 적용 */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
-              {/* 메인 홈페이지와 동일한 집 모양 SVG 아이콘 */}
               <svg 
                 viewBox="0 0 24 24" 
                 fill="none" 
@@ -89,7 +97,6 @@ export default function ProjectsPage() {
             </span>
           </Link>
 
-          {/* 내비게이션 메뉴 */}
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/#about" className="text-gray-600 hover:text-primary font-bold text-sm transition-colors">회사소개</Link>
             <Link href="/#business" className="text-gray-600 hover:text-primary font-bold text-sm transition-colors">사업분야</Link>
@@ -152,7 +159,6 @@ export default function ProjectsPage() {
                   key={project.id}
                   className="group bg-white rounded-[2rem] border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
-                  {/* 카드 상단 이미지 영역 */}
                   <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
                     {project.imageUrl ? (
                       <img
@@ -172,7 +178,6 @@ export default function ProjectsPage() {
                     )}
                   </div>
 
-                  {/* 카드 하단 텍스트 영역 */}
                   <div className="p-6 flex-grow flex flex-col justify-between">
                     <div>
                       <span className="text-accent text-[10px] font-black tracking-widest uppercase block mb-1">

@@ -2,10 +2,10 @@
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
-import { collection, doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { RevealItem } from '../SectionReveal';
-import { Trophy, Calendar, CheckCircle } from 'lucide-react';
+import { Trophy, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface YearlyStat {
@@ -16,76 +16,77 @@ interface YearlyStat {
 export function ProjectStatus() {
   const db = useFirestore();
   const [yearlyStats, setYearlyStats] = useState<YearlyStat[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    // 관리자가 입력한 연도별 실적 수치를 실시간으로 감시합니다.
+    // Firestore의 'siteSettings/stats' 문서를 실시간으로 감시합니다.
     const statsRef = doc(db, 'siteSettings', 'stats');
     
-    const unsubStats = onSnapshot(statsRef, (docSnap) => {
+    const unsubscribe = onSnapshot(statsRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+        // 데이터베이스 내의 'yearlyStats' 맵을 배열로 변환
         const statsMap = data.yearlyStats || {};
-        
-        // 맵 형태의 데이터를 배열로 변환하고 연도순으로 정렬합니다.
         const sortedStats = Object.entries(statsMap)
           .map(([year, count]) => ({ 
-            year, 
+            year: year.toString(), 
             count: Number(count) 
           }))
           .sort((a, b) => a.year.localeCompare(b.year));
           
-        // 만약 데이터가 비어있다면 기본값 설정
-        if (sortedStats.length === 0) {
+        // 데이터가 비어있지 않은 경우에만 업데이트
+        if (sortedStats.length > 0) {
+          setYearlyStats(sortedStats);
+        } else {
+          // 문서가 있지만 비어있을 경우 기본값
           setYearlyStats([
             { year: '2025', count: 12 },
             { year: '2026', count: 8 }
           ]);
-        } else {
-          setYearlyStats(sortedStats);
         }
       } else {
-        // 문서가 아예 없는 경우 기본값 표시
+        // 문서가 아예 없는 경우 초기 기본값 설정
         setYearlyStats([
           { year: '2025', count: 12 },
           { year: '2026', count: 8 }
         ]);
       }
-      setLoading(false);
+      setIsInitialLoading(false);
     }, (error) => {
-      console.error("실적 데이터 로딩 오류:", error);
-      // 에러 발생 시에도 기본값은 보여줌
+      console.error("Firestore Stats Error:", error);
+      // 에러 발생 시에도 빈 화면이 나오지 않도록 기본값 유지
       setYearlyStats([
         { year: '2025', count: 12 },
         { year: '2026', count: 8 }
       ]);
-      setLoading(false);
+      setIsInitialLoading(false);
     });
 
-    return () => unsubStats();
+    return () => unsubscribe();
   }, [db]);
 
-  // 모든 연도의 실적 건수를 합산하여 누적 시공 사례를 계산합니다.
+  // 모든 연도의 실적 건수 합산
   const totalCumulativeCount = useMemo(() => {
     return yearlyStats.reduce((acc, curr) => acc + curr.count, 0);
   }, [yearlyStats]);
 
-  if (loading) {
+  if (isInitialLoading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex justify-center items-center py-20 min-h-[300px]">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <span className="ml-3 text-muted-foreground font-medium">데이터를 불러오는 중...</span>
       </div>
     );
   }
 
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      {/* 관리자가 등록한 각 연도별 실적 카드 */}
+      {/* 데이터베이스에서 불러온 연도별 실적 카드 */}
       {yearlyStats.map((stat, i) => (
         <RevealItem key={stat.year} delay={i * 100} className="relative group h-full">
-          <div className="p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left bg-white border-muted hover:border-accent text-primary">
+          <div className="p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left bg-white border-muted hover:border-accent group-hover:shadow-lg">
             <div className="mb-6 flex items-center justify-between">
-              <div className="text-accent">
+              <div className="text-accent bg-accent/10 p-2 rounded-lg">
                 <Calendar className="w-6 h-6" />
               </div>
             </div>
@@ -93,18 +94,18 @@ export function ProjectStatus() {
               <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground">
                 {stat.year}년 완수 실적
               </p>
-              <h4 className="text-4xl font-black">{stat.count.toLocaleString()}건</h4>
+              <h4 className="text-4xl font-black text-primary">{stat.count.toLocaleString()}건</h4>
             </div>
           </div>
         </RevealItem>
       ))}
 
-      {/* 누적 시공 사례 카드 (항상 마지막에 강조되어 표시) */}
-      <RevealItem delay={(yearlyStats.length + 1) * 100} className="relative group lg:col-span-1 h-full">
+      {/* 누적 시공 사례 강조 카드 */}
+      <RevealItem delay={yearlyStats.length * 100} className="relative group h-full">
         <Link href="/projects">
           <div className="p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-105 z-10 hover:bg-primary/90 cursor-pointer">
             <div className="mb-6 flex items-center justify-between">
-              <div className="text-accent">
+              <div className="text-accent bg-white/10 p-2 rounded-lg">
                 <CheckCircle className="w-6 h-6" />
               </div>
               <Trophy className="w-5 h-5 text-accent animate-bounce" />

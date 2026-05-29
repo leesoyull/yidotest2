@@ -18,8 +18,8 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// 어떤 파일에서든 길을 잃지 않도록 글로벌 열쇠통에 등록!
+// 자바스크립트가 바로 알아듣는 쉬운 방식으로 변경!
 if (typeof window !== "undefined") {
-  (window as any).db = db;
-  (window as any).storage = storage;
+  window.db = db;
+  window.storage = storage;
 }

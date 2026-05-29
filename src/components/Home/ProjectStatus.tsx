@@ -8,19 +8,28 @@ import { RevealItem } from '../SectionReveal';
 import { Trophy, Calendar, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
+interface YearlyStat {
+  year: string;
+  count: number;
+}
+
 export function ProjectStatus() {
-  const [stats2025, setStats2025] = useState(12);
-  const [stats2026, setStats2026] = useState(8);
+  const [yearlyStats, setYearlyStats] = useState<YearlyStat[]>([]);
   const [projectCount, setProjectCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. 실적 수치 실시간 리스너
+    // 1. 실적 통계 실시간 리스너 (동적 리스트)
     const unsubStats = onSnapshot(doc(db, 'siteSettings', 'stats'), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        setStats2025(data.count2025 || 0);
-        setStats2026(data.count2026 || 0);
+        const statsMap = data.yearlyStats || {};
+        const sortedStats = Object.entries(statsMap)
+          .map(([year, count]) => ({ year, count: Number(count) }))
+          .sort((a, b) => a.year.localeCompare(b.year)); // 오름차순 (2025, 2026...)
+        setYearlyStats(sortedStats);
       }
+      setLoading(false);
     });
 
     // 2. 실제 등록된 프로젝트 건수 리스너
@@ -34,58 +43,59 @@ export function ProjectStatus() {
     };
   }, []);
 
-  // 누적 건수: 2025년 관리값 + 2026년 관리값 + 등록된 프로젝트 건수 (또는 요구사항에 맞춰 로직 조정 가능)
-  // 여기서는 단순히 관리자가 입력한 값의 합계로 표시하거나, 합산 로직을 적용합니다.
-  const totalCumulativeCount = useMemo(() => stats2025 + stats2026, [stats2025, stats2026]);
+  // 누적 건수: 모든 관리자 입력 실적 + 실제 등록 건수 (필요에 따라 로직 조정)
+  const totalCumulativeCount = useMemo(() => {
+    const adminTotal = yearlyStats.reduce((acc, curr) => acc + curr.count, 0);
+    // 실제 등록 건수를 더할지, 아니면 관리자 입력값만 쓸지 결정 가능
+    // 여기서는 모든 수치를 합산합니다.
+    return adminTotal;
+  }, [yearlyStats]);
 
-  const stats = [
-    { label: '2025년 완수 실적', value: `${stats2025}건`, icon: <Calendar className="w-6 h-6" /> },
-    { label: '2026년 완수 실적', value: `${stats2026}건`, icon: <Calendar className="w-6 h-6" /> },
-    { label: '누적 시공 사례', value: `${totalCumulativeCount}건`, icon: <CheckCircle className="w-6 h-6" />, highlight: true },
-  ];
+  if (loading) return null;
 
   return (
-    <div className="grid md:grid-cols-3 gap-8">
-      {stats.map((stat, i) => {
-        const content = (
-          <div key={i} className={`p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left ${
-            stat.highlight 
-            ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-105 z-10 hover:bg-primary/90 cursor-pointer' 
-            : 'bg-white border-muted hover:border-accent text-primary'
-          }`}>
-            <div className={`mb-6 flex items-center justify-between`}>
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      {yearlyStats.map((stat, i) => (
+        <RevealItem key={stat.year} delay={i * 100} className="relative group h-full">
+          <div className="p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left bg-white border-muted hover:border-accent text-primary">
+            <div className="mb-6 flex items-center justify-between">
               <div className="text-accent">
-                {stat.icon}
+                <Calendar className="w-6 h-6" />
               </div>
-              {stat.highlight && <Trophy className="w-5 h-5 text-accent animate-bounce" />}
             </div>
             <div className="space-y-2">
-              <p className={`text-xs font-bold tracking-widest uppercase ${stat.highlight ? 'text-white/70' : 'text-muted-foreground'}`}>
-                {stat.label}
+              <p className="text-xs font-bold tracking-widest uppercase text-muted-foreground">
+                {stat.year}년 완수 실적
               </p>
-              <h4 className="text-4xl font-black">{stat.value}</h4>
+              <h4 className="text-4xl font-black">{stat.count}건</h4>
             </div>
-            {stat.highlight && (
-              <div className="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-medium flex justify-between items-center">
-                <span>* 실시간 실적 반영 기준</span>
-                <span className="text-accent font-bold flex items-center gap-1">상세보기 →</span>
-              </div>
-            )}
           </div>
-        );
+        </RevealItem>
+      ))}
 
-        return (
-          <RevealItem key={i} delay={i * 100} className="relative group">
-            {stat.highlight ? (
-              <Link href="/projects">
-                {content}
-              </Link>
-            ) : (
-              content
-            )}
-          </RevealItem>
-        );
-      })}
+      {/* 누적 시공 사례 카드 (항상 마지막에 표시) */}
+      <RevealItem delay={yearlyStats.length * 100} className="relative group lg:col-span-1 h-full">
+        <Link href="/projects">
+          <div className="p-8 rounded-2xl border-2 h-full transition-all duration-500 text-left bg-primary border-primary text-white shadow-xl shadow-primary/20 scale-105 z-10 hover:bg-primary/90 cursor-pointer">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="text-accent">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+              <Trophy className="w-5 h-5 text-accent animate-bounce" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-bold tracking-widest uppercase text-white/70">
+                누적 시공 사례
+              </p>
+              <h4 className="text-4xl font-black">{totalCumulativeCount}건</h4>
+            </div>
+            <div className="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-medium flex justify-between items-center">
+              <span>* 실시간 실적 반영 기준</span>
+              <span className="text-accent font-bold flex items-center gap-1">전체보기 →</span>
+            </div>
+          </div>
+        </Link>
+      </RevealItem>
     </div>
   );
 }

@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Loader2, Plus, Image as ImageIcon, MessageSquare, Trash2, Calendar, MapPin, User, Phone, LayoutGrid, Edit, BarChart3 } from 'lucide-react';
+import { Loader2, Plus, Image as ImageIcon, MessageSquare, Trash2, Calendar, MapPin, User, Phone, LayoutGrid, Edit, BarChart3, X } from 'lucide-react';
 
 interface Inquiry {
   id: string;
@@ -36,6 +36,11 @@ interface Project {
   location?: string;
   storagePath?: string;
   createdAt: any;
+}
+
+interface YearlyStat {
+  year: string;
+  count: number;
 }
 
 export default function AdminPage() {
@@ -60,9 +65,10 @@ export default function AdminPage() {
   const [editYear, setEditYear] = useState('');
   const [editLocation, setEditLocation] = useState('');
 
-  // 실적 통계 상태
-  const [stats2025, setStats2025] = useState(12);
-  const [stats2026, setStats2026] = useState(8);
+  // 실적 통계 상태 (동적 리스트)
+  const [yearlyStats, setYearlyStats] = useState<YearlyStat[]>([]);
+  const [newStatYear, setNewStatYear] = useState('');
+  const [newStatCount, setNewStatCount] = useState('');
   const [statsLoading, setStatsLoading] = useState(false);
 
   // 실시간 데이터 상태
@@ -82,12 +88,14 @@ export default function AdminPage() {
       setProjects(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Project[]);
     });
 
-    // 실적 통계 실시간 리스너
     const unsubscribeStats = onSnapshot(doc(db, 'siteSettings', 'stats'), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        setStats2025(data.count2025 || 0);
-        setStats2026(data.count2026 || 0);
+        const statsMap = data.yearlyStats || {};
+        const sortedStats = Object.entries(statsMap)
+          .map(([year, count]) => ({ year, count: Number(count) }))
+          .sort((a, b) => b.year.localeCompare(a.year));
+        setYearlyStats(sortedStats);
       }
     });
 
@@ -167,17 +175,37 @@ export default function AdminPage() {
     }
   };
 
-  const handleUpdateStats = async () => {
+  const handleAddYearlyStat = async () => {
+    if (!newStatYear || !newStatCount) return;
     setStatsLoading(true);
     try {
+      const updatedStats = { ...Object.fromEntries(yearlyStats.map(s => [s.year, s.count])), [newStatYear]: Number(newStatCount) };
       await setDoc(doc(db, 'siteSettings', 'stats'), {
-        count2025: Number(stats2025),
-        count2026: Number(stats2026),
+        yearlyStats: updatedStats,
         updatedAt: serverTimestamp()
       }, { merge: true });
-      toast({ title: "통계 업데이트 완료" });
+      setNewStatYear('');
+      setNewStatCount('');
+      toast({ title: "연도별 실적 추가 완료" });
     } catch (error) {
-      toast({ variant: "destructive", title: "업데이트 실패" });
+      toast({ variant: "destructive", title: "추가 실패" });
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const handleRemoveYearlyStat = async (yearToRemove: string) => {
+    if (!confirm(`${yearToRemove}년 실적을 삭제하시겠습니까?`)) return;
+    setStatsLoading(true);
+    try {
+      const updatedStats = Object.fromEntries(yearlyStats.filter(s => s.year !== yearToRemove).map(s => [s.year, s.count]));
+      await setDoc(doc(db, 'siteSettings', 'stats'), {
+        yearlyStats: updatedStats,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      toast({ title: "삭제 완료" });
+    } catch (error) {
+      toast({ variant: "destructive", title: "삭제 실패" });
     } finally {
       setStatsLoading(false);
     }
@@ -240,19 +268,27 @@ export default function AdminPage() {
 
             <TabsContent value="inquiries" className="space-y-6">
               <div className="grid gap-4">
-                {inquiries.map((item) => (
-                  <Card key={item.id} className="border-none shadow-sm rounded-2xl p-8">
-                    <div className="flex flex-col md:flex-row justify-between gap-6">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-xs font-bold text-accent uppercase tracking-widest"><Calendar className="w-3 h-3" />{item.createdAt?.toDate().toLocaleDateString()}</div>
-                        <h3 className="text-xl font-black text-primary flex items-center gap-2"><User className="w-4 h-4" />{item.name}</h3>
-                        <p className="text-sm font-bold text-muted-foreground"><Phone className="w-3 h-3 inline mr-1" />{item.phone}</p>
+                {inquiries.length === 0 ? (
+                  <div className="text-center py-20 text-muted-foreground font-medium bg-white rounded-2xl">접수된 상담 문의가 없습니다.</div>
+                ) : (
+                  inquiries.map((item) => (
+                    <Card key={item.id} className="border-none shadow-sm rounded-2xl p-8">
+                      <div className="flex flex-col md:flex-row justify-between gap-6">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-xs font-bold text-accent uppercase tracking-widest"><Calendar className="w-3 h-3" />{item.createdAt?.toDate().toLocaleDateString()}</div>
+                          <h3 className="text-xl font-black text-primary flex items-center gap-2"><User className="w-4 h-4" />{item.name}</h3>
+                          <p className="text-sm font-bold text-muted-foreground"><Phone className="w-3 h-3 inline mr-1" />{item.phone}</p>
+                          <p className="text-xs text-muted-foreground">{item.email}</p>
+                        </div>
+                        <div className="flex-1 bg-muted/30 p-6 rounded-2xl italic font-medium">
+                          <div className="text-xs font-bold text-primary mb-2">[{item.serviceType}]</div>
+                          "{item.content}"
+                        </div>
+                        <Button variant="ghost" className="text-red-400 self-start" onClick={() => deleteDoc(doc(db, 'inquiries', item.id))}><Trash2 /></Button>
                       </div>
-                      <div className="flex-1 bg-muted/30 p-6 rounded-2xl italic font-medium">"{item.content}"</div>
-                      <Button variant="ghost" className="text-red-400" onClick={() => deleteDoc(doc(db, 'inquiries', item.id))}><Trash2 /></Button>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))
+                )}
               </div>
             </TabsContent>
 
@@ -335,32 +371,62 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="stats">
-              <Card className="max-w-md mx-auto p-10 rounded-[2rem] shadow-xl border-none">
-                <CardHeader className="text-center p-0 mb-8">
-                  <BarChart3 className="w-12 h-12 text-accent mx-auto mb-4" />
-                  <CardTitle className="text-2xl font-black">실적 건수 수동 관리</CardTitle>
-                  <CardDescription>홈페이지 메인에 노출되는 실적 숫자를 직접 수정합니다.</CardDescription>
-                </CardHeader>
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="font-bold">2025년 완수 실적 (건수)</Label>
-                    <Input type="number" value={stats2025} onChange={(e) => setStats2025(Number(e.target.value))} className="h-12" />
+              <div className="grid lg:grid-cols-2 gap-8">
+                <Card className="p-10 rounded-[2.5rem] shadow-xl border-none">
+                  <CardHeader className="p-0 mb-8">
+                    <div className="bg-accent/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
+                      <Plus className="w-8 h-8 text-accent" />
+                    </div>
+                    <CardTitle className="text-2xl font-black">실적 연도 추가</CardTitle>
+                    <CardDescription>새로운 연도의 실적 수치를 추가합니다.</CardDescription>
+                  </CardHeader>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="font-bold">연도 (예: 2027)</Label>
+                      <Input type="number" placeholder="2027" value={newStatYear} onChange={(e) => setNewStatYear(e.target.value)} className="h-14" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-bold">완수 건수 (건)</Label>
+                      <Input type="number" placeholder="10" value={newStatCount} onChange={(e) => setNewStatCount(e.target.value)} className="h-14" />
+                    </div>
+                    <Button onClick={handleAddYearlyStat} disabled={statsLoading} className="w-full h-16 bg-primary text-lg font-bold">
+                      {statsLoading ? <Loader2 className="animate-spin" /> : "실적 추가하기"}
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="font-bold">2026년 완수 실적 (건수)</Label>
-                    <Input type="number" value={stats2026} onChange={(e) => setStats2026(Number(e.target.value))} className="h-12" />
+                </Card>
+
+                <Card className="p-10 rounded-[2.5rem] shadow-xl border-none">
+                  <CardHeader className="p-0 mb-8">
+                    <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
+                      <BarChart3 className="w-8 h-8 text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl font-black">현재 실적 목록</CardTitle>
+                    <CardDescription>홈페이지에 노출 중인 연도별 실적입니다.</CardDescription>
+                  </CardHeader>
+                  <div className="space-y-4">
+                    {yearlyStats.length === 0 ? (
+                      <p className="text-center py-10 text-muted-foreground">등록된 실적 데이터가 없습니다.</p>
+                    ) : (
+                      yearlyStats.map((stat) => (
+                        <div key={stat.year} className="flex items-center justify-between p-5 bg-muted/20 rounded-2xl border border-muted/50 group hover:bg-white hover:shadow-lg transition-all">
+                          <div>
+                            <span className="text-sm font-bold text-muted-foreground block uppercase tracking-widest">{stat.year}년 실적</span>
+                            <span className="text-2xl font-black text-primary">{stat.count}건</span>
+                          </div>
+                          <Button variant="ghost" size="icon" className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleRemoveYearlyStat(stat.year)}>
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
                   </div>
-                  <Button onClick={handleUpdateStats} disabled={statsLoading} className="w-full h-14 bg-primary text-lg font-bold">
-                    {statsLoading ? <Loader2 className="animate-spin" /> : "실적 정보 업데이트"}
-                  </Button>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
       </div>
 
-      {/* 수정 다이얼로그 */}
       <Dialog open={!!editingProject} onOpenChange={() => setEditingProject(null)}>
         <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader><DialogTitle className="font-black text-2xl">시공 사례 수정</DialogTitle></DialogHeader>
